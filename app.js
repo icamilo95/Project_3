@@ -429,6 +429,7 @@ Game.prototype.hit = function(){
   //tester------------------tester
   for (var i = 0; i < this.playersArray.length -1; i++) {
     console.log("Player Idx: "+ [i] +" HAND:  "+ this.playersArray[i].hand);
+    console.log("Player Idx: "+ [i] +" TOTAL-------:  "+ this.playersArray[i].totalvalue);
   }
   //tester------------------tester ends
 
