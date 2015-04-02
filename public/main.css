@@ -1,0 +1,112 @@
+
+/*-------Background------*/
+#background {
+   max-width: 100%;
+   height: auto;
+   width: auto;
+}
+
+/*-------Player------*/
+#hit {
+   position: relative;
+   bottom: 50px;
+   left: 423px;
+}
+
+#stand {
+   position: relative;
+   bottom: 85px;
+   left: 533px;
+}
+
+#walletScore {
+   color: white;
+   position: relative;
+   bottom: 112px;
+   left: 673px;
+
+}
+
+.player_card_1 {
+   color: white;
+   position: relative;
+   bottom: 512px;
+   left: 403px;   
+}
+
+.player_card_2 {
+   color: white;
+   position: relative;
+   bottom: 542px;
+   left: 523px;   
+}
+
+.player_card_3 {
+   color: white;
+   position: relative;
+   bottom: 572px;
+   left: 643px;   
+}
+
+.player_card_4 {
+   color: white;
+   position: relative;
+   bottom: 602px;
+   left: 763px;   
+}
+
+.player_card_5 {
+   color: white;
+   position: relative;
+   bottom: 632px;
+   left: 883px;   
+}
+
+
+.time {
+   color: white;
+   position: relative;
+   bottom: 502px;
+   left: 753px;   
+}
+
+/*-------Dealer------*/
+
+.delaer_card_1 {
+   color: white;
+   position: relative;
+   bottom: 512px;
+   left: 403px;   
+}
+
+.delaer_card_2 {
+   color: white;
+   position: relative;
+   bottom: 542px;
+   left: 523px;   
+}
+
+.delaer_card_3 {
+   color: white;
+   position: relative;
+   bottom: 572px;
+   left: 643px;   
+}
+
+.delaer_card_4 {
+   color: white;
+   position: relative;
+   bottom: 602px;
+   left: 763px;   
+}
+
+.delaer_card_5 {
+   color: white;
+   position: relative;
+   bottom: 632px;
+   left: 883px;   
+}
+
+.dealer_card_1 {
+   background-image: url("/img/10_of_clubs.png");
+}
