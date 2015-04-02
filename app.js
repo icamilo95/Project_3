@@ -81,7 +81,7 @@ Deck.prototype = {
 
 var Player = function(name, status){
     this.name = name;
-    this.money = 130;
+    this.money = 100;
     this.hand = [];
     this.totalValue = 0;
     this.aceCounter = 0;
@@ -176,6 +176,10 @@ Game.prototype.deal = function(index, cards){
     // this sets the current hand equal to the hand concatinated with the cards drawn
     this.playersArray[index].hand = this.playersArray[index].hand.concat(this.currentDeck.draw(cards));
     this.playersArray[index].totalhand();
+
+    if(this.playersArray.length -2 >= this.turn ){
+      userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
+    }
     // console.log("My cards" + this.playersArray[index].hand);
 };
  
@@ -188,48 +192,68 @@ Game.prototype.checkForWinner = function(index) {
   // Instance of the Dealer
   var dealer = this.playersArray[this.playersArray.length-1]; 
   var player = this.playersArray[index];
-    
+    console.log(player.name + " Hand : " + player.hand);
+    console.log("Dealer Hand : " + dealer.hand);
+    console.log("Dealer Total: " , dealer.totalValue);
     // Player busted  
     if (player.totalValue > 21) {
         player.bet = 0;
-        console.log("Player Busted - checkForWinner");
+        console.log("-------------------------------");
+        console.log("Player Busted");
+        console.log("-------------------------------");
     // Dealer Wins with BlackJack   
     } else if (dealer.blackjack() && !(player.blackjack())) {
       player.bet = 0;
-      console.log("Delaer wins with BLACKJACK");
+      console.log("-------------------------------");
+      console.log("Dealer wins with BLACKJACK");
+      console.log("-------------------------------");
     // Player Win    
     } else if (player.totalValue > dealer.totalValue){
         if (player.blackjack()) {
           player.money += (player.bet * 2.5);  
+          console.log("-------------------------------");
           console.log("Player Wins with BLACKJACK ");
+          console.log("-------------------------------");
         } else {
           player.money += (player.bet * 2);  
-          console.log("Player Wins (110)");
+          console.log("-------------------------------");
+          console.log("Player Wins");
+          console.log("-------------------------------");
         } 
         player.bet = 0;
     // Dealer Busted - Player Win    
+
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue > 21)) {
       player.money += (player.bet * 2);
       player.bet = 0;  
+      console.log("-------------------------------");
       console.log("Player Wins - Dealer Busted");
+      console.log("-------------------------------");
     // Dealer Win   
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue < 22)){
       player.bet = 0;
+      console.log("-------------------------------");
       console.log("Dealer Wins ");
+      console.log("-------------------------------");
     // Tie Game    
     } else if (player.totalValue === dealer.totalValue) {
       if (player.blackjack() && !dealer.blackjack()) {
         player.money += (player.bet * 2.5);  
+        console.log("-------------------------------");
         console.log("Player Wins with BJ and Dealer only 21");    
+        console.log("-------------------------------");
       } 
       player.totalValue += player.bet;  
       player.bet = 0;
+      console.log("-------------------------------");
       console.log("Tie Game");
+      console.log("-------------------------------");
     }
 
     //tester------------------tester
   for (var i = 0; i < this.playersArray.length -1; i++) {
-    console.log("Player Idx: "+ [i] +" MONEY:  "+ this.playersArray[i].money);
+    // console.log("Player Idx: "+ [i] +" MONEY:  "+ this.playersArray[i].money);
+    io.emit('wallet',this.playersArray[i].money );
   }
   //tester------------------tester ends
 
@@ -291,7 +315,11 @@ Game.prototype.initialDeal = function() {
   this.playersArray.forEach(function(el, index){
      _this.deal(index,2);
   });
-    
+  
+  if(this.playersArray.length -2 >= this.turn ){
+      userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
+    }
+
 };
 
 
@@ -321,19 +349,19 @@ var startGame = function(array){
 };
 
 
-var joinGame = function() {
-  console.log("People in the RP : ", roomPlayer);
+var joinGame = function() {  
 console.log("---------------------------");
-console.log("Join game is being called");
+console.log("         New Round         ");
 console.log("---------------------------");
-  
-  
+// console.log("328 People in the RP : ", roomPlayer);
+// console.log("329 People in the queue : ", queue);
+
   if ((userName) || (roomPlayer.length > 0 && queue.length > 0)){
     
     if (!playerIntheRP()) {
       
       roomPlayer.unshift(userName);
-      console.log("RP: ", roomPlayer); 
+      // console.log("RP: ", roomPlayer); 
 
     }
     if (g !== null) {
@@ -341,7 +369,7 @@ console.log("---------------------------");
         if (gameInProcess === true) {
           console.log("342 gameInProcess-------------- ", gameInProcess);
           queue.push(new Player(userName, "Joined next hand"));
-          // io.emit('player joined next hand', g.playersArray[cont].status);
+          // io.emit('player joined next hand', gsio..playersArray[cont].status);
  
  // Send message to the player --> "Joined the next hand" ---------------(Display on Player Side)
           
@@ -355,9 +383,15 @@ console.log("---------------------------");
           g.setUpRound();
         }
     } else {
-      console.log("358 RP - Start game is about to be called: ", roomPlayer);
+      // console.log("358 RP - Start game is about to be called: ", roomPlayer);
       startGame(roomPlayer);  
-      console.log("Player 1 started the Game");
+      
+      //tester------------------tester
+      for (var j = 0; j < g.playersArray.length ; j++) {
+        console.log("363 Player Name: "+ g.playersArray[j].name);
+      }
+      //tester------------------tester ends
+      
       g.setUpRound();    
     }
   }
@@ -384,8 +418,10 @@ Game.prototype.setUpRound = function(){
 
   //tester------------------tester
   for (var i = 0; i < this.playersArray.length ; i++) {
-    console.log("387 Player Idx: "+ [i] +" HAND:  "+ this.playersArray[i].hand);
-    console.log("388 Player Idx: "+ [i] +" TOTAL:--------- "+ this.playersArray[i].totalValue);
+    
+    console.log("421 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
+
+    console.log("422 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
 
@@ -427,7 +463,7 @@ Game.prototype.playTimer = function(){
   _this.cleanTimer =  clearInterval(_this.intervalId);
     // count1 = 11;
     // console.log("Interval cleared");
-  },20000);
+  },21000);
 
 };
 
@@ -451,16 +487,16 @@ Game.prototype.hit = function(){
 
   //tester------------------tester
   for (var i = 0; i < this.playersArray.length -1; i++) {
-    console.log("453 Player Idx: "+ [i] +" HAND:  "+ this.playersArray[i].hand);
-    console.log("454 Player Idx: "+ [i] +" TOTAL-------:  "+ this.playersArray[i].totalValue);
+    console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
+    console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
 
 
   // -----Sends the hando to the player
-  if(this.playersArray.length -2 >= this.turn ){
-    userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
-  }
+  // if(this.playersArray.length -2 >= this.turn ){
+  //   userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
+  // }
   //----Does the hit function
   if (this.playersArray[this.turn].busted()) {
     this.playersArray[this.turn].status = "Busted";
@@ -496,14 +532,14 @@ Game.prototype.nextTurn = function(){
   // }
 
   this.turn += 1;
-  console.log("498 This turn starting nexturn", this.turn);
+  
   if (this.playersArray.length-1 > this.turn) {
     this.playRound(); 
     console.log("501 Next Turn with many players"); 
   } else {
-    console.log("503 length:////// ",this.playersArray.length);
+    // console.log("503 length:////// ",this.playersArray.length);
     for (var i = 0; i < this.playersArray.length-1; i++) {
-      console.log("505 Turn:()()()()()()()()()()()()()()()()() " ,i );  
+     
       this.checkForWinner(i);
       
     }
@@ -521,7 +557,8 @@ Game.prototype.nextTurn = function(){
 
 Game.prototype.finishHand = function() {
   gameInProcess = false;
-  // console.log(" 522 Game in process in finish hand", gameInProcess);
+  io.emit('delete previous cards',this.playersArray[this.turn].hand);
+    
   // this.invitePlayers();
   // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   var finishTimer = setTimeout(function(){
@@ -534,7 +571,7 @@ Game.prototype.finishHand = function() {
       joinGame();
     }
     
-  },5000);
+  },10000);
 
 };
 
@@ -559,11 +596,11 @@ Game.prototype.reset = function(){
       for (var i = 0; i < this.playersArray.length; i++) {
         this.playersArray[i].aceCounter = 0;  
         this.playersArray[i].hand = [];
-        this.playersArray[i].bet = 10;
-        this.currentDeck = new Deck();
-        queue = [];
-        
+        this.playersArray[i].bet = 10;  
       }
+      this.currentDeck = new Deck();
+      queue = [];
+      // io.emit('delete previous cards',this.playersArray[this.turn].hand);
 };
 
    
@@ -615,13 +652,11 @@ var userHash = {};
     socket.on("hit request", function(){
       g.hit();
     });
-    f = 0;
+    
     socket.on("stand request", function(){
-      console.log("before stand request");
-      f += 1;
-      console.log("F = " +f);
+         
       g.stand();
-      console.log("after stand request");
+    
     });
 });
 

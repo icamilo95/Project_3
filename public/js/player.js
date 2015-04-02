@@ -56,9 +56,24 @@ $(document).ready(function() {
 
    socket.on('cards', function(cards){
       for (var i=0;i<cards.length;i++){
-        $('.player_card_'+ i).text(cards[i].rank + "of " + cards[i].suit);
+        $('.player_card_'+ (i + 1)).text(cards[i].rank + " of " + cards[i].suit);
+        // $('.player_card_'+ (i + 1)).text("|", cards[i]);
+        // $('.player_card_'+ (i + 1)).text(this.playersArray[i].hand);
       }
     });
+
+   socket.on('wallet', function(money){
+      console.log("Wallet is called");
+      $('#walletScore').text(money);
+    });
+
+   socket.on('delete previous cards', function(cards){
+    console.log("delete cards is called on client ");
+    for (var i=0;i < cards.length;i++){
+        $('.player_card_'+ (i + 1)).text(" ");
+      }
+      console.log("delete cards is called on client 2");
+   });
 
   //----------------------SOCKET OTHER
 

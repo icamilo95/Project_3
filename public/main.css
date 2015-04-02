@@ -6,6 +6,12 @@
    width: auto;
 }
 
+#joinGame {
+   position: relative;
+   bottom: 830px;
+   left: 63px;
+}
+
 /*-------Player------*/
 #hit {
    position: relative;
@@ -15,7 +21,7 @@
 
 #stand {
    position: relative;
-   bottom: 85px;
+   bottom: 90px;
    left: 533px;
 }
 
@@ -30,81 +36,81 @@
 .player_card_1 {
    color: white;
    position: relative;
-   bottom: 512px;
-   left: 403px;   
+   bottom: 500px;
+   left: 130px;   
 }
 
 .player_card_2 {
    color: white;
    position: relative;
-   bottom: 542px;
-   left: 523px;   
+   bottom: 523px;
+   left: 330px;   
 }
 
 .player_card_3 {
    color: white;
    position: relative;
-   bottom: 572px;
-   left: 643px;   
+   bottom: 546px;
+   left: 530px;   
 }
 
 .player_card_4 {
    color: white;
    position: relative;
-   bottom: 602px;
-   left: 763px;   
+   bottom: 569px;
+   left: 730px;   
 }
 
 .player_card_5 {
    color: white;
    position: relative;
-   bottom: 632px;
-   left: 883px;   
+   bottom: 592px;
+   left: 933px;   
 }
 
 
 .time {
    color: white;
    position: relative;
-   bottom: 502px;
+   bottom: 552px;
    left: 753px;   
 }
 
 /*-------Dealer------*/
 
-.delaer_card_1 {
+.dealer_card_10 {
    color: white;
    position: relative;
-   bottom: 512px;
-   left: 403px;   
+   bottom: 462px;
+   left: 130px;   
 }
 
-.delaer_card_2 {
+.dealer_card_2 {
    color: white;
    position: relative;
-   bottom: 542px;
-   left: 523px;   
+   bottom: 494px;
+   left: 330px;   
 }
 
-.delaer_card_3 {
+.dealer_card_3 {
    color: white;
    position: relative;
-   bottom: 572px;
-   left: 643px;   
+   bottom: 522px;
+   left: 530px;   
 }
 
-.delaer_card_4 {
+.dealer_card_4 {
    color: white;
    position: relative;
-   bottom: 602px;
-   left: 763px;   
+   bottom: 544px;
+   left: 730px;   
 }
 
-.delaer_card_5 {
+.dealer_card_5 {
    color: white;
    position: relative;
-   bottom: 632px;
-   left: 883px;   
+   bottom: 570px;
+   left: 930px;   
 }
 
 .dealer_card_1 {
