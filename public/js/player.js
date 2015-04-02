@@ -68,9 +68,7 @@ $(document).ready(function() {
   // });
 
 
-  $('#stand').on("submit", function(){
-    socket.emit('stand request');
-  });
+  
 
 
 

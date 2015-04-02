@@ -81,7 +81,7 @@ Deck.prototype = {
 
 var Player = function(name, status){
     this.name = name;
-    this.money = 30;
+    this.money = 130;
     this.hand = [];
     this.totalValue = 0;
     this.aceCounter = 0;
@@ -192,7 +192,7 @@ Game.prototype.checkForWinner = function(index) {
     // Player busted  
     if (player.totalValue > 21) {
         player.bet = 0;
-        console.log("Player Busted (90)");
+        console.log("Player Busted - checkForWinner");
     // Dealer Wins with BlackJack   
     } else if (dealer.blackjack() && !(player.blackjack())) {
       player.bet = 0;
@@ -201,7 +201,7 @@ Game.prototype.checkForWinner = function(index) {
     } else if (player.totalValue > dealer.totalValue){
         if (player.blackjack()) {
           player.money += (player.bet * 2.5);  
-          console.log("Player Wins with BLACKJACK (115)");
+          console.log("Player Wins with BLACKJACK ");
         } else {
           player.money += (player.bet * 2);  
           console.log("Player Wins (110)");
@@ -211,7 +211,7 @@ Game.prototype.checkForWinner = function(index) {
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue > 21)) {
       player.money += (player.bet * 2);
       player.bet = 0;  
-      console.log("Player Wins - Dealer Busted (110)");
+      console.log("Player Wins - Dealer Busted");
     // Dealer Win   
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue < 22)){
       player.bet = 0;
@@ -226,6 +226,15 @@ Game.prototype.checkForWinner = function(index) {
       player.bet = 0;
       console.log("Tie Game");
     }
+
+    //tester------------------tester
+  for (var i = 0; i < this.playersArray.length -1; i++) {
+    console.log("Player Idx: "+ [i] +" MONEY:  "+ this.playersArray[i].money);
+  }
+  //tester------------------tester ends
+
+
+
 };
 
 //-------------- DELAER STATUS -----------------------
@@ -313,15 +322,24 @@ var startGame = function(array){
 
 
 var joinGame = function() {
+  console.log("People in the RP : ", roomPlayer);
 console.log("---------------------------");
 console.log("Join game is being called");
+console.log("---------------------------");
+  
+  
   if ((userName) || (roomPlayer.length > 0 && queue.length > 0)){
+    
     if (!playerIntheRP()) {
-      roomPlayer.unshift(userName); 
+      
+      roomPlayer.unshift(userName);
+      console.log("RP: ", roomPlayer); 
+
     }
     if (g !== null) {
-        if (gameInProcess) {
-
+        
+        if (gameInProcess === true) {
+          console.log("342 gameInProcess-------------- ", gameInProcess);
           queue.push(new Player(userName, "Joined next hand"));
           // io.emit('player joined next hand', g.playersArray[cont].status);
  
@@ -329,12 +347,15 @@ console.log("Join game is being called");
           
         } else{
           for (var i = 0; i < queue.length; i++) {
+            console.log("350 Splice is about to be called: ", queue[i]);
             g.playersArray.splice(-1,0,(queue[i]));
           }
           g.reset();
+
           g.setUpRound();
         }
     } else {
+      console.log("358 RP - Start game is about to be called: ", roomPlayer);
       startGame(roomPlayer);  
       console.log("Player 1 started the Game");
       g.setUpRound();    
@@ -342,9 +363,10 @@ console.log("Join game is being called");
   }
 };
 
-playerIntheRP = function(){
+var playerIntheRP = function(){
   for (var i = 0; i < roomPlayer.length; i++) {
       if (roomPlayer[i] === userName) {
+        console.log("369 UserName in playerIntheRP: ",userName);
         return true;
       } 
   }
@@ -362,16 +384,17 @@ Game.prototype.setUpRound = function(){
 
   //tester------------------tester
   for (var i = 0; i < this.playersArray.length ; i++) {
-    console.log("Player Idx: "+ [i] +" HAND:  "+ this.playersArray[i].hand);
-    console.log("Player Idx: "+ [i] +" TOTAL:--------- "+ this.playersArray[i].totalValue);
+    console.log("387 Player Idx: "+ [i] +" HAND:  "+ this.playersArray[i].hand);
+    console.log("388 Player Idx: "+ [i] +" TOTAL:--------- "+ this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
 
 };
 
 Game.prototype.playRound = function(){
+  
   this.playersArray[this.turn].money -= this.playersArray[this.turn].bet;
-  this.playersArray[this.turn].status = "Your this.turn"; 
+  this.playersArray[this.turn].status = "Your turn"; 
   this.playTimer();
 };
 
@@ -404,7 +427,7 @@ Game.prototype.playTimer = function(){
   _this.cleanTimer =  clearInterval(_this.intervalId);
     // count1 = 11;
     // console.log("Interval cleared");
-  },21000);
+  },20000);
 
 };
 
@@ -428,8 +451,8 @@ Game.prototype.hit = function(){
 
   //tester------------------tester
   for (var i = 0; i < this.playersArray.length -1; i++) {
-    console.log("Player Idx: "+ [i] +" HAND:  "+ this.playersArray[i].hand);
-    console.log("Player Idx: "+ [i] +" TOTAL-------:  "+ this.playersArray[i].totalvalue);
+    console.log("453 Player Idx: "+ [i] +" HAND:  "+ this.playersArray[i].hand);
+    console.log("454 Player Idx: "+ [i] +" TOTAL-------:  "+ this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
 
@@ -465,6 +488,7 @@ this.nextTurn();
 };
 
 Game.prototype.nextTurn = function(){
+  
   //delete next lines
   // console.log("Player1 money " + g.playersArray[0].money);
   // if (g.playersArray.length > 2) {
@@ -472,23 +496,32 @@ Game.prototype.nextTurn = function(){
   // }
 
   this.turn += 1;
+  console.log("498 This turn starting nexturn", this.turn);
   if (this.playersArray.length-1 > this.turn) {
     this.playRound(); 
-    console.log("Next Turn with many players"); 
+    console.log("501 Next Turn with many players"); 
   } else {
-    console.log("length ",this.playersArray.length);
-    for (var i = 0; i <= this.playersArray.length-2; i++) {
-      // console.log("Turn: " ,i );  
+    console.log("503 length:////// ",this.playersArray.length);
+    for (var i = 0; i < this.playersArray.length-1; i++) {
+      console.log("505 Turn:()()()()()()()()()()()()()()()()() " ,i );  
       this.checkForWinner(i);
       
     }
+
   this.finishHand();
   }
+  gameInProcess = false;
+  // console.log("512 Players: ", this.playersArray.length);
+  // console.log("513 Players: ", this.playersArray);
+
+
+
 };
 
 
 Game.prototype.finishHand = function() {
   gameInProcess = false;
+  // console.log(" 522 Game in process in finish hand", gameInProcess);
   // this.invitePlayers();
   // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   var finishTimer = setTimeout(function(){
@@ -496,6 +529,7 @@ Game.prototype.finishHand = function() {
     // for (var i = 0; i < g.playersArray.length; i++) {
       // if (g.playersArray[i].money > 0) {}; 
     // };
+    // console.log("530 Right before join a new game");
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }
@@ -527,6 +561,8 @@ Game.prototype.reset = function(){
         this.playersArray[i].hand = [];
         this.playersArray[i].bet = 10;
         this.currentDeck = new Deck();
+        queue = [];
+        
       }
 };
 
@@ -556,7 +592,7 @@ app.get('/blackjack', function(req, res){
   res.render('blackjack');
 
 userName = req.cookies['username'];
-
+// console.log("UserName", userName);
 });
 
 
@@ -579,8 +615,13 @@ var userHash = {};
     socket.on("hit request", function(){
       g.hit();
     });
+    f = 0;
     socket.on("stand request", function(){
+      console.log("before stand request");
+      f += 1;
+      console.log("F = " +f);
       g.stand();
+      console.log("after stand request");
     });
 });
 
