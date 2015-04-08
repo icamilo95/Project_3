@@ -91,6 +91,14 @@
    left: 550px;   
 }
 
+/*----NEXT ROUND TIMER----*/
+#finalTimer {
+   color: white;
+   position: relative;
+   bottom: 730px;
+   left: 530px;   
+}
+
 /*-------Dealer------*/
 
 #dealer_card_1 {

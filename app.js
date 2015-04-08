@@ -356,7 +356,7 @@ Game.prototype.clearDeck = function(){
 // -------------------JOIN GAME  ------------------------------
 
 
-var roomPlayer = [], gameInProcess = false, queue = [], g = null;
+var roomPlayer = [], gameInProcess = false, queue = [], g = null, count2 = 0;
 
 // -------------------START GAME  ------------------------------
 var startGame = function(array){
@@ -556,23 +556,42 @@ Game.prototype.nextTurn = function(){
 Game.prototype.finishHand = function() {
   gameInProcess = false;
   _this = this;
+  count2 = 10;
+  this.finishIntervalTrigger();
   // this.invitePlayers();
   // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   var finishTimer = setTimeout(function(){  
     // for (var i = 0; i < g.playersArray.length; i++) {
       // if (g.playersArray[i].money > 0) {}; 
     // };
+    io.emit('delete finish timer');
+    _this.cleanTimer =  clearInterval(_this.finishIntervalId);
     for (var i = 0; i < _this.playersArray.length -1; i++) {
     userHash[_this.playersArray[i].name].emit('delete previous cards',_this.playersArray[i].hand);
-    console.log("Deleted cards of ", _this.playersArray[i].name);
+    io.emit('delete winner message');
   }
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }
-    
   },10000);
-
 };
+
+
+Game.prototype.finishIntervalTrigger = function(){
+  var _this = this;
+  this.finishIntervalId = setInterval(function() {
+    _this.finishCallCounter();
+  },1000);
+};
+
+Game.prototype.finishCallCounter = function(){  
+  console.log(count1);
+  count2 -= 1;
+  io.emit("set finish time", count2 );
+};
+
+
+
 
 Game.prototype.logOut = function () {
   if (this.roomPlayer.length === 1 ) {

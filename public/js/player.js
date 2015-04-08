@@ -31,10 +31,17 @@ $(document).ready(function() {
 
   socket.on("set time", function(msg){
     $('#time1').text(msg + " seconds");
-    if (msg === 3) {
-      $('.hitb').attr("disabled",true);
-    }  
+    // if (msg === 3) {
+    //   $('.hitb').attr("disabled",true);
+    // }  
   });
+
+  socket.on("set finish time", function(msg){
+    $('#finalTimer').text("Next round in "+ msg + " seconds");
+  });
+  
+
+
 
   socket.on('hide', function(msg){
           $('.standb').attr("disabled",true);
@@ -83,6 +90,15 @@ $(document).ready(function() {
    socket.on('turn', function(name){
       $('#turn').text(name + "'s turn");
     });
+
+   socket.on('delete winner message', function(message){
+      $('#winnerMessage').text(" ");
+    }); 
+
+   socket.on('delete finish timer', function(message){
+      $('#finalTimer').text(" ");
+    }); 
+
 
    socket.on('delete previous cards', function(cards){
     for (var i=0;i < 5;i++){
