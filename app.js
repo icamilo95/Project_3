@@ -250,18 +250,13 @@ Game.prototype.checkForWinner = function(index) {
       console.log("-------------------------------");
     }
 
-    //tester------------------tester
+    
+  
+    //------------------Displays the money for every player
   for (var i = 0; i < this.playersArray.length -1; i++) {
-    // console.log("Player Idx: "+ [i] +" MONEY:  "+ this.playersArray[i].money);
-    io.emit('wallet',this.playersArray[i].money );
+    userHash[this.playersArray[i].name].emit('wallet',this.playersArray[i].money);  
   }
 
-  
-
-
-
-
-  //tester------------------tester ends
 
 
 
