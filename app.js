@@ -412,12 +412,15 @@ Game.prototype.setUpRound = function(){
     // It displays de first Dealer's card  
       userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
     }
-    
+
   //tester------------------tester
     console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
     console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
+
+  // Next line shows all the players on the table
+    io.emit ('active players', this.playersArray);    
 
 };
 
@@ -528,15 +531,22 @@ Game.prototype.finishHand = function() {
   _this = this;
   count2 = 10;
   this.finishIntervalTrigger();
-  // this.invitePlayers();
-  // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
+
+  this.invitePlayersForAnotherRound();//------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
+  //--- Next Timer sets up 10 sec before the next round 
   var finishTimer = setTimeout(function(){  
+  // next line emits command to delete the timer message  
     io.emit('delete finish timer');
+  // next line deletes "play again" message from screen
+    io.emit("play again");
+  // Next line stops the timer on the screen for every player  
     _this.cleanTimer =  clearInterval(_this.finishIntervalId);
+  // Next lines remove previos set of cards from the table  
     for (var i = 0; i < _this.playersArray.length -1; i++) {
     userHash[_this.playersArray[i].name].emit('delete previous cards',_this.playersArray[i].hand);
     io.emit('delete winner message');
   }
+
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }
@@ -558,15 +568,21 @@ Game.prototype.finishCallCounter = function(){
 };
 
 
+Game.prototype.invitePlayersForAnotherRound = function(){
+  io.emit("play again");
+};
+
 Game.prototype.logOut = function () {
-  if (this.roomPlayer.length === 1 ) {
-    g = null;
-  }
+  
   for (var i = 0; i < roomPlayer.length; i++) {
     roomPlayer.splice(roomPlayer[i],1);
   }
-  for (var j = 0; j < playersArray.length; j++) {
-    playersArray.splice(playersArray[j],1);
+  for (var j = 0; j < this.playersArray.length; j++) {
+    this.playersArray.splice(this.playersArray[j],1);
+  }
+  if (roomPlayer.length === 1 ) {
+    console.log("got the null");
+    g = null;
   }
 };
 
@@ -633,9 +649,11 @@ var userHash = {};
     });
     
     socket.on("stand request", function(){
-         
       g.stand();
-    
+    });
+
+    socket.on("leave the table", function(){
+      g.logOut();
     });
 });
 

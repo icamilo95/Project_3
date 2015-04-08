@@ -1,6 +1,6 @@
 $(document).ready(function() { 
 
-
+$('#leaveTableButton').toggle();
 // // -------------------ADD NEW PLAYERS  ------------------------------
 
 // // startGame(["nick", "camilo"]);
@@ -27,10 +27,15 @@ $(document).ready(function() {
     socket.emit('stand request');
   });  
 
+  $('#leaveTable').on("submit", function(e){
+    socket.emit('leave the table');
+  });  
+
+
   //----------------------SOCKET LISTENERS
 
   socket.on("set time", function(msg){
-    $('#time1').text(msg + " seconds");
+    $('#time1').text(" -  " + msg + " seconds");
     // if (msg === 3) {
     //   $('.hitb').attr("disabled",true);
     // }  
@@ -40,6 +45,14 @@ $(document).ready(function() {
     $('#finalTimer').text("Next round in "+ msg + " seconds");
   });
   
+  socket.on("active players", function(players){
+    for (var i = 0; i < players.length -1; i++) {
+      $('#currentPlayers').append('<li>' + players[i].name + '</li>');
+    }
+  });
+
+
+
   socket.on('hide', function(msg){
           $('.standb').attr("disabled",true);
           $('.hitb').attr("disabled",true);
@@ -80,16 +93,20 @@ $(document).ready(function() {
 
 
    socket.on('wallet', function(money){
-      console.log("Wallet is called");
-      $('#walletScore').text(money);
+      $('#walletScore').text('$ ' + money);
     });
 
    socket.on('turn', function(name){
       $('#turn').text(name + "'s turn");
     });
 
+   socket.on('play again', function(){
+      $('#leaveTableButton').toggle();
+    }); 
+
    socket.on('delete winner message', function(message){
       $('#winnerMessage').text(" ");
+      $('#currentPlayers').empty();
     }); 
 
    socket.on('delete finish timer', function(message){
