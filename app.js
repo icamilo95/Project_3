@@ -25,7 +25,7 @@ var Card = function (suit, rank) {
   }
 
   else(this.value = this.rank);
-  
+
 };
 
 Card.SUITS = [
@@ -382,7 +382,7 @@ console.log("---------------------------");
         console.log("363 Player Name: "+ g.playersArray[j].name);
       }
       //tester------------------tester ends
-      g.setUpRound();    
+      g.setUpRound();
     }
   }
 };
@@ -392,7 +392,7 @@ var playerIntheRP = function(){
       if (roomPlayer[i] === userName) {
         console.log("369 UserName in playerIntheRP: ",userName);
         return true;
-      } 
+      }
   }
   return false;
 };
@@ -422,9 +422,9 @@ Game.prototype.setUpRound = function(){
 };
 
 Game.prototype.playRound = function(){
-  
+
   this.playersArray[this.turn].money -= this.playersArray[this.turn].bet;
-  this.playersArray[this.turn].status = "Your turn"; 
+  this.playersArray[this.turn].status = "Your turn";
   this.playTimer();
 };
 
@@ -434,7 +434,7 @@ Game.prototype.displayButtonsToPlayer = function() {
 
 Game.prototype.hidePlayerHsButtons = function() {
   // if  (this.playersArray.length -2 >= this.turn){
-  if (this.playersArray[this.turn].name !== "Dealer") {  
+  if (this.playersArray[this.turn].name !== "Dealer") {
     userHash[this.playersArray[this.turn].name].emit('hide',"HI!!!!!");
   }
 }; 
@@ -631,11 +631,17 @@ var userHash = {};
     socket.on("hit request", function(){
       g.hit();
     });
-    
     socket.on("stand request", function(){
-         
       g.stand();
-    
+
+    });
+    // bet logic goes here:
+    socket.on("bet", function(newBet){
+      
+      g.playersArray[g.turn].bet += parseInt(newBet);
+      console.log('--------newBet-----');
+      console.log(g.playersArray[g.turn].bet);
+      console.log('-------------------');
     });
 });
 

@@ -25,7 +25,12 @@ $(document).ready(function() {
 
   $('#stand').on("submit", function(e){
     socket.emit('stand request');
-  });  
+  });
+
+  $(".bet").on("submit", function(e){
+
+    socket.emit('bet', $('.bet-val').val());
+  });
 
   //----------------------SOCKET LISTENERS
 
@@ -33,78 +38,79 @@ $(document).ready(function() {
     $('#time1').text(msg + " seconds");
     // if (msg === 3) {
     //   $('.hitb').attr("disabled",true);
-    // }  
+    // }
   });
 
   socket.on("set finish time", function(msg){
     $('#finalTimer').text("Next round in "+ msg + " seconds");
   });
-  
+
   socket.on('hide', function(msg){
-          $('.standb').attr("disabled",true);
-          $('.hitb').attr("disabled",true);
-      });
+    $('.standb').attr("disabled",true);
+    $('.hitb').attr("disabled",true);
+    $('.betb').attr("disabled",true);
+  });
 
   socket.on('show', function(){
-          $('.hitb').attr("disabled",false);
-          $('.standb').attr("disabled",false);
-      });
+    $('.hitb').attr("disabled",false);
+    $('.standb').attr("disabled",false);
+    $('.betb').attr("disabled",false);
+  });
 
-
-   socket.on('cards', function(cards){
-      for (var i=0;i < cards.length;i++){
+  socket.on('cards', function(cards){
+    for (var i=0;i < cards.length;i++){
       var val_1 = cards[i].rank + " of " + cards[i].suit;
       $('#player_card_'+ (i + 1)).text(val_1);
       $('#player_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
       
-      }
-    });
+    }
+  });
 
-   socket.on('card_1_Dealer', function(cards){
-      var val_1 = cards[0].rank + " of " + cards[0].suit;
-      $('#dealer_card_1').attr('src','/img/'+ val_1 +'.png');      
-    });
+  socket.on('card_1_Dealer', function(cards){
+    var val_1 = cards[0].rank + " of " + cards[0].suit;
+    $('#dealer_card_1').attr('src','/img/'+ val_1 +'.png');      
+  });
 
 
-   socket.on('rest of dealers cards', function(cards){
-      for (var i=1;i < cards.length;i++){
+  socket.on('rest of dealers cards', function(cards){
+    for (var i=1;i < cards.length;i++){
       var val_1 = cards[i].rank + " of " + cards[i].suit;
       $('#dealer_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
       
-      }
-    });
+    }
+  });
 
-   socket.on('winner', function(message){
-      $('#winnerMessage').text(message);
-    }); 
+  socket.on('winner', function(message){
+    $('#winnerMessage').text(message);
+  }); 
+  
+
+  socket.on('wallet', function(money){
+    console.log("Wallet is called");
+    $('#walletScore').text(money);
+  });
+
+  socket.on('turn', function(name){
+    $('#turn').text(name + "'s turn");
+  });
+
+  socket.on('delete winner message', function(message){
+    $('#winnerMessage').text(" ");
+  }); 
+
+  socket.on('delete finish timer', function(message){
+    $('#finalTimer').text(" ");
+  }); 
 
 
-   socket.on('wallet', function(money){
-      console.log("Wallet is called");
-      $('#walletScore').text(money);
-    });
-
-   socket.on('turn', function(name){
-      $('#turn').text(name + "'s turn");
-    });
-
-   socket.on('delete winner message', function(message){
-      $('#winnerMessage').text(" ");
-    }); 
-
-   socket.on('delete finish timer', function(message){
-      $('#finalTimer').text(" ");
-    }); 
-
-
-   socket.on('delete previous cards', function(cards){
+  socket.on('delete previous cards', function(cards){
     for (var i=0;i < 5;i++){
-        $('#player_card_'+ (i + 1)).removeAttr('src');
-        $('#dealer_card_'+ (i + 1)).removeAttr('src');
-      }
-      console.log("Got it for this player, deleting " );
+      $('#player_card_'+ (i + 1)).removeAttr('src');
+      $('#dealer_card_'+ (i + 1)).removeAttr('src');
+    }
+    console.log("Got it for this player, deleting " );
     
-   });
+  });
 
   //----------------------SOCKET OTHER
 
