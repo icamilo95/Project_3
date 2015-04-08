@@ -416,7 +416,13 @@ Game.prototype.setUpRound = function(){
     // It displays cards for all players but the Dealer
     if (this.playersArray[i].name !== "Dealer") {
       userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
+      userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
+      console.log("Dealer 1 card ", this.playersArray[this.playersArray.length -1].hand);
     }
+    
+    
+      
+    
   //tester------------------tester
     console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
     console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
@@ -490,10 +496,6 @@ Game.prototype.hit = function(){
   //tester------------------tester ends
 
 
-  // -----Sends the hando to the player
-  // if(this.playersArray.length -2 >= this.turn ){
-  //   userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
-  // }
   //----Does the hit function
   if (this.playersArray[this.turn].busted()) {
     this.playersArray[this.turn].status = "Busted";
@@ -521,39 +523,22 @@ this.nextTurn();
 };
 
 Game.prototype.nextTurn = function(){
-  
-  //delete next lines
-  // console.log("Player1 money " + g.playersArray[0].money);
-  // if (g.playersArray.length > 2) {
-    // console.log("Player2 money " + g.playersArray[1].money);
-  // }
-
   this.turn += 1;
-  
   if (this.playersArray.length-1 > this.turn) {
     this.playRound(); 
     console.log("501 Next Turn with many players"); 
   } else {
-    // console.log("503 length:////// ",this.playersArray.length);
     for (var i = 0; i < this.playersArray.length-1; i++) {
-     
       this.checkForWinner(i);
-      
     }
-
   this.finishHand();
   }
   gameInProcess = false;
-    
 };
 
 
 Game.prototype.finishHand = function() {
   gameInProcess = false;
-  // for (var i = 0; i < this.playersArray.length -1; i++) {
-  //   userHash[this.playersArray[i].name].emit('delete previous cards',this.playersArray[i].hand);
-  //   console.log("Deleted cards of ", this.playersArray[i].name);
-  // }
   _this = this;
   // this.invitePlayers();
   // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
@@ -561,13 +546,10 @@ Game.prototype.finishHand = function() {
     // for (var i = 0; i < g.playersArray.length; i++) {
       // if (g.playersArray[i].money > 0) {}; 
     // };
-    
     for (var i = 0; i < _this.playersArray.length -1; i++) {
     userHash[_this.playersArray[i].name].emit('delete previous cards',_this.playersArray[i].hand);
     console.log("Deleted cards of ", _this.playersArray[i].name);
   }
-
-
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }

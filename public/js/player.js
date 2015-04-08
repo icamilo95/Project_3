@@ -56,6 +56,13 @@ $(document).ready(function() {
       }
     });
 
+   socket.on('card_1_Dealer', function(cards){
+      var val_1 = cards[0].rank + " of " + cards[0].suit;
+      $('#dealer_card_1').attr('src','/img/'+ val_1 +'.png');      
+    });
+
+
+
    socket.on('wallet', function(money){
       console.log("Wallet is called");
       $('#walletScore').text(money);

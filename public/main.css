@@ -37,34 +37,34 @@
 
 #player_card_1 {
   position: relative;
-  bottom: 500px;
-  left: 330px;   
+  bottom: 350px;
+  left: -100px;   
   
 }
 
 #player_card_2 {
    
    position: relative;
-   bottom: 500px;
-   left: 330px;   
+   bottom: 350px;
+   left: -100px;   
 }
 
 #player_card_3 {
    position: relative;
-   bottom: 500px;
-   left: 330px;   
+   bottom: 350px;
+   left: -100px;   
 }
 
 #player_card_4 {
    position: relative;
-   bottom: 500px;
-   left: 330px;   
+   bottom: 350px;
+   left: -100px;   
 }
 
 #player_card_5 {
    position: relative;
-   bottom: 500px;
-   left: 330px;   
+   bottom: 350px;
+   left: -100px;   
 }
 
 /*----TABLE TIMER----*/
@@ -85,39 +85,38 @@
 
 /*-------Dealer------*/
 
-.dealer_card_10 {
-   color: white;
+#dealer_card_1 {
    position: relative;
-   bottom: 462px;
-   left: 130px;   
-}
-
-.dealer_card_2 {
-   color: white;
-   position: relative;
-   bottom: 494px;
+   bottom: 562px;
    left: 330px;   
 }
 
-.dealer_card_3 {
+#dealer_card_2 {
    color: white;
    position: relative;
-   bottom: 522px;
-   left: 530px;   
+   bottom: 562px;
+   left: 330px;   
 }
 
-.dealer_card_4 {
+#dealer_card_3 {
    color: white;
    position: relative;
-   bottom: 544px;
-   left: 730px;   
+   bottom: 562px;
+   left: 330px;   
 }
 
-.dealer_card_5 {
+#dealer_card_4 {
    color: white;
    position: relative;
-   bottom: 570px;
-   left: 930px;   
+   bottom: 562px;
+   left: 330px;   
+}
+
+#dealer_card_5 {
+   color: white;
+   position: relative;
+   bottom: 562px;
+   left: 330px;   
 }
 
 /*.dealer_card_1 {
