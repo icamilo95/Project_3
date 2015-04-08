@@ -187,7 +187,7 @@ Game.prototype.deal = function(index, cards){
 // -------------------CHECK FOR WINNER -----------------
 
 Game.prototype.checkForWinner = function(index) {
-  
+  var win = "";
   this.dealerStatus();
   // Instance of the Dealer
   var dealer = this.playersArray[this.playersArray.length-1]; 
@@ -198,12 +198,14 @@ Game.prototype.checkForWinner = function(index) {
     // Player busted  
     if (player.totalValue > 21) {
         player.bet = 0;
+        win += ("- " + player.name + " Busted - ");
         console.log("-------------------------------");
         console.log(player.name + " Busted");
         console.log("-------------------------------");
     // Dealer Wins with BlackJack   
     } else if (dealer.blackjack() && !(player.blackjack())) {
       player.bet = 0;
+      win += "- Dealer wins with BLACKJACK - ";
       console.log("-------------------------------");
       console.log("Dealer wins with BLACKJACK");
       console.log("-------------------------------");
@@ -211,11 +213,13 @@ Game.prototype.checkForWinner = function(index) {
     } else if (player.totalValue > dealer.totalValue){
         if (player.blackjack()) {
           player.money += (player.bet * 2.5);  
+          win += " - " + player.name + " wins with BLACKJACK - ";
           console.log("-------------------------------");
           console.log(player.name + " wins with BLACKJACK ");
           console.log("-------------------------------");
         } else {
           player.money += (player.bet * 2);  
+          win += " - " + player.name + " wins - ";
           console.log("-------------------------------");
           console.log(player.name + " wins");
           console.log("-------------------------------");
@@ -226,12 +230,14 @@ Game.prototype.checkForWinner = function(index) {
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue > 21)) {
       player.money += (player.bet * 2);
       player.bet = 0;  
+      win += " - " + player.name +" wins - Dealer Busted - ";
       console.log("-------------------------------");
       console.log(player.name +" wins - Dealer Busted");
       console.log("-------------------------------");
     // Dealer Win   
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue < 22)){
       player.bet = 0;
+      win = " - Dealer Wins -";
       console.log("-------------------------------");
       console.log("Dealer Wins ");
       console.log("-------------------------------");
@@ -239,22 +245,25 @@ Game.prototype.checkForWinner = function(index) {
     } else if (player.totalValue === dealer.totalValue) {
       if (player.blackjack() && !dealer.blackjack()) {
         player.money += (player.bet * 2.5);  
+        win = " - " + player.name +" wins with BJ and Dealer only 21 - ";
         console.log("-------------------------------");
         console.log( player.name +" wins with BJ and Dealer only 21");    
         console.log("-------------------------------");
       } 
       player.totalValue += player.bet;  
       player.bet = 0;
+      win = " - Tie Game - ";
       console.log("-------------------------------");
       console.log("Tie Game");
       console.log("-------------------------------");
     }
 
   
-    //-------------Displays the money for every player
+    //-------------Displays the money, dealers cards and Winner for every player
   for (var i = 0; i < this.playersArray.length -1; i++) {
     userHash[this.playersArray[i].name].emit('wallet',this.playersArray[i].money);  
     userHash[this.playersArray[i].name].emit("rest of dealers cards", this.playersArray[this.playersArray.length -1].hand);
+    userHash[this.playersArray[i].name].emit('winner',win);  
   }
 
   // for (var j = 0; j < this.playersArray.length ; j++) {

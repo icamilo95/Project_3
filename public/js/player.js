@@ -70,7 +70,9 @@ $(document).ready(function() {
       }
     });
 
-    
+   socket.on('winner', function(message){
+      $('#winnerMessage').text(message);
+    }); 
 
 
    socket.on('wallet', function(money){

@@ -75,11 +75,19 @@
    left: 550px;   
 }
 
-/*----TABLE TIMER----*/
+/*----TURN ----*/
 .turn {
    color: white;
    position: relative;
    bottom: 372px;
+   left: 550px;   
+}
+
+/*----WINNER MESSAGE----*/
+#winnerMessage {
+   color: white;
+   position: relative;
+   bottom: 530px;
    left: 550px;   
 }
 
