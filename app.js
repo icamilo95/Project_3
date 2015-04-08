@@ -29,10 +29,10 @@ var Card = function (suit, rank) {
 };
 
 Card.SUITS = [
-  Card.CLUBS    = 'Clubs',
-  Card.DIAMONDS = 'Diamonds',
-  Card.HEARTS   = 'Hearts',
-  Card.SPADES   = 'Spades'
+  Card.CLUBS    = 'clubs',
+  Card.DIAMONDS = 'diamonds',
+  Card.HEARTS   = 'hearts',
+  Card.SPADES   = 'spades'
 ];
 
 Card.prototype = {
@@ -43,7 +43,7 @@ Card.prototype = {
     return this.rank;
   },
   toString: function() {
-    var rank = {1: 'Ace', 11: 'Jack', 12: 'Queen', 13: 'King'}[this.rank] || this.rank;
+    var rank = {1: 'ace', 11: 'jack', 12: 'queen', 13: 'king'}[this.rank] || this.rank;
     return rank + ' of ' + this.suit;
   }
 };
@@ -192,14 +192,14 @@ Game.prototype.checkForWinner = function(index) {
   // Instance of the Dealer
   var dealer = this.playersArray[this.playersArray.length-1]; 
   var player = this.playersArray[index];
-    console.log(player.name + " Hand : " + player.hand);
+    // console.log(player.name + " Hand : " + player.hand);
     console.log("Dealer Hand : " + dealer.hand);
     console.log("Dealer Total: " , dealer.totalValue);
     // Player busted  
     if (player.totalValue > 21) {
         player.bet = 0;
         console.log("-------------------------------");
-        console.log("Player Busted");
+        console.log(player.name + " Busted");
         console.log("-------------------------------");
     // Dealer Wins with BlackJack   
     } else if (dealer.blackjack() && !(player.blackjack())) {
@@ -212,12 +212,12 @@ Game.prototype.checkForWinner = function(index) {
         if (player.blackjack()) {
           player.money += (player.bet * 2.5);  
           console.log("-------------------------------");
-          console.log("Player Wins with BLACKJACK ");
+          console.log(player.name + " wins with BLACKJACK ");
           console.log("-------------------------------");
         } else {
           player.money += (player.bet * 2);  
           console.log("-------------------------------");
-          console.log("Player Wins");
+          console.log(player.name + " wins");
           console.log("-------------------------------");
         } 
         player.bet = 0;
@@ -227,7 +227,7 @@ Game.prototype.checkForWinner = function(index) {
       player.money += (player.bet * 2);
       player.bet = 0;  
       console.log("-------------------------------");
-      console.log("Player Wins - Dealer Busted");
+      console.log(player.name +" wins - Dealer Busted");
       console.log("-------------------------------");
     // Dealer Win   
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue < 22)){
@@ -240,7 +240,7 @@ Game.prototype.checkForWinner = function(index) {
       if (player.blackjack() && !dealer.blackjack()) {
         player.money += (player.bet * 2.5);  
         console.log("-------------------------------");
-        console.log("Player Wins with BJ and Dealer only 21");    
+        console.log( player.name +" wins with BJ and Dealer only 21");    
         console.log("-------------------------------");
       } 
       player.totalValue += player.bet;  
@@ -255,6 +255,12 @@ Game.prototype.checkForWinner = function(index) {
     // console.log("Player Idx: "+ [i] +" MONEY:  "+ this.playersArray[i].money);
     io.emit('wallet',this.playersArray[i].money );
   }
+
+  
+
+
+
+
   //tester------------------tester ends
 
 
@@ -375,7 +381,7 @@ console.log("---------------------------");
           
         } else{
           for (var i = 0; i < queue.length; i++) {
-            console.log("350 Splice is about to be called: ", queue[i]);
+            // console.log("350 Splice is about to be called: ", queue[i]);
             g.playersArray.splice(-1,0,(queue[i]));
           }
           g.reset();
@@ -415,13 +421,14 @@ Game.prototype.setUpRound = function(){
   g.initialDeal();
   this.turn = 0;
   this.playRound();
-
-  //tester------------------tester
   for (var i = 0; i < this.playersArray.length ; i++) {
-    
-    console.log("421 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
-
-    console.log("422 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
+    // It displays cards for all players but the Dealer
+    if (this.playersArray[i].name !== "Dealer") {
+      userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
+    }
+  //tester------------------tester
+    console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
+    console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
 
@@ -547,26 +554,24 @@ Game.prototype.nextTurn = function(){
   this.finishHand();
   }
   gameInProcess = false;
-  // console.log("512 Players: ", this.playersArray.length);
-  // console.log("513 Players: ", this.playersArray);
-
-
-
+    
 };
 
 
 Game.prototype.finishHand = function() {
   gameInProcess = false;
-  io.emit('delete previous cards',this.playersArray[this.turn].hand);
-    
+  for (var i = 0; i < this.playersArray.length -1; i++) {
+    userHash[this.playersArray[i].name].emit('delete previous cards',this.playersArray[i].hand);
+    console.log("Deleted cards of ", this.playersArray[i].name);
+  }
+  
   // this.invitePlayers();
   // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
-  var finishTimer = setTimeout(function(){
-    // console.log("second timer reached after 2 secs");
+  var finishTimer = setTimeout(function(){  
     // for (var i = 0; i < g.playersArray.length; i++) {
       // if (g.playersArray[i].money > 0) {}; 
     // };
-    // console.log("530 Right before join a new game");
+    
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }

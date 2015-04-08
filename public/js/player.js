@@ -27,14 +27,10 @@ $(document).ready(function() {
     socket.emit('stand request');
   });  
 
-
-
-
   //----------------------SOCKET LISTENERS
 
   socket.on("set time", function(msg){
     $('#time1').text(msg + " scs");
-    console.log(msg);
     if (msg === 3) {
       $('.hitb').attr("disabled",true);
     }  
@@ -47,7 +43,6 @@ $(document).ready(function() {
       });
 
   socket.on('show', function(){
-    console.log("Camilo, show works");
           $('.hitb').attr("disabled",false);
           $('.standb').attr("disabled",false);
           console.log("works 1");
@@ -55,10 +50,11 @@ $(document).ready(function() {
 
 
    socket.on('cards', function(cards){
-      for (var i=0;i<cards.length;i++){
-        $('.player_card_'+ (i + 1)).text(cards[i].rank + " of " + cards[i].suit);
-        // $('.player_card_'+ (i + 1)).text("|", cards[i]);
-        // $('.player_card_'+ (i + 1)).text(this.playersArray[i].hand);
+      for (var i=0;i < cards.length;i++){
+      var val_1 = cards[i].rank + " of " + cards[i].suit;
+      $('#player_card_'+ (i + 1)).text(val_1);
+      $('#player_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
+      
       }
     });
 
@@ -68,11 +64,11 @@ $(document).ready(function() {
     });
 
    socket.on('delete previous cards', function(cards){
-    console.log("delete cards is called on client ");
-    for (var i=0;i < cards.length;i++){
-        $('.player_card_'+ (i + 1)).text(" ");
+    for (var i=0;i < 5;i++){
+        $('#player_card_'+ (i + 1)).removeAttr('src');
       }
-      console.log("delete cards is called on client 2");
+      console.log("Got it for this player, deleting " );
+    
    });
 
   //----------------------SOCKET OTHER
