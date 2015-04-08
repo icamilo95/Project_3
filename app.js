@@ -550,11 +550,11 @@ Game.prototype.nextTurn = function(){
 
 Game.prototype.finishHand = function() {
   gameInProcess = false;
-  for (var i = 0; i < this.playersArray.length -1; i++) {
-    userHash[this.playersArray[i].name].emit('delete previous cards',this.playersArray[i].hand);
-    console.log("Deleted cards of ", this.playersArray[i].name);
-  }
-  
+  // for (var i = 0; i < this.playersArray.length -1; i++) {
+  //   userHash[this.playersArray[i].name].emit('delete previous cards',this.playersArray[i].hand);
+  //   console.log("Deleted cards of ", this.playersArray[i].name);
+  // }
+  _this = this;
   // this.invitePlayers();
   // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   var finishTimer = setTimeout(function(){  
@@ -562,6 +562,12 @@ Game.prototype.finishHand = function() {
       // if (g.playersArray[i].money > 0) {}; 
     // };
     
+    for (var i = 0; i < _this.playersArray.length -1; i++) {
+    userHash[_this.playersArray[i].name].emit('delete previous cards',_this.playersArray[i].hand);
+    console.log("Deleted cards of ", _this.playersArray[i].name);
+  }
+
+
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }
