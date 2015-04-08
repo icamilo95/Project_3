@@ -62,6 +62,16 @@ $(document).ready(function() {
     });
 
 
+   socket.on('rest of dealers cards', function(cards){
+      for (var i=1;i < cards.length;i++){
+      var val_1 = cards[i].rank + " of " + cards[i].suit;
+      $('#dealer_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
+      
+      }
+    });
+
+    
+
 
    socket.on('wallet', function(money){
       console.log("Wallet is called");
@@ -75,6 +85,7 @@ $(document).ready(function() {
    socket.on('delete previous cards', function(cards){
     for (var i=0;i < 5;i++){
         $('#player_card_'+ (i + 1)).removeAttr('src');
+        $('#dealer_card_'+ (i + 1)).removeAttr('src');
       }
       console.log("Got it for this player, deleting " );
     

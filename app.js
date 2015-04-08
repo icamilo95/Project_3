@@ -254,7 +254,17 @@ Game.prototype.checkForWinner = function(index) {
     //-------------Displays the money for every player
   for (var i = 0; i < this.playersArray.length -1; i++) {
     userHash[this.playersArray[i].name].emit('wallet',this.playersArray[i].money);  
+    userHash[this.playersArray[i].name].emit("rest of dealers cards", this.playersArray[this.playersArray.length -1].hand);
   }
+
+  // for (var j = 0; j < this.playersArray.length ; j++) {
+  //   // It displays cards for all players but the Dealer
+  //   if (this.playersArray[i].name !== "Dealer") {
+  //     userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
+  //   // It displays de first Dealer's card  
+  //     userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
+  //   }
+
 
 };
 
@@ -416,12 +426,9 @@ Game.prototype.setUpRound = function(){
     // It displays cards for all players but the Dealer
     if (this.playersArray[i].name !== "Dealer") {
       userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
+    // It displays de first Dealer's card  
       userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
-      console.log("Dealer 1 card ", this.playersArray[this.playersArray.length -1].hand);
     }
-    
-    
-      
     
   //tester------------------tester
     console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
