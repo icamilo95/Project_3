@@ -14,8 +14,8 @@ $(document).ready(function() {
   var socket = io();  
 
   $('#joinGame').on("submit", function(e){
-    // e.preventDefault();
     socket.emit("join game");
+    $('#joinGameButton').attr("disabled",true);
   });
 
 
@@ -40,9 +40,6 @@ $(document).ready(function() {
     $('#finalTimer').text("Next round in "+ msg + " seconds");
   });
   
-
-
-
   socket.on('hide', function(msg){
           $('.standb').attr("disabled",true);
           $('.hitb').attr("disabled",true);

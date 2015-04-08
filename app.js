@@ -58,8 +58,6 @@ var Deck = function() {
   this.shuffle();
 };
 
-// gameState = {currentTurn: 2, players:[{name: "dealer"} {name: "nick", faceUp: [instances], faceDown: [instances], }]}
-
 
 // -------------------DECK CLASS ------------------------------
 
@@ -180,7 +178,6 @@ Game.prototype.deal = function(index, cards){
     if(this.playersArray.length -2 >= this.turn ){
       userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
     }
-    // console.log("My cards" + this.playersArray[index].hand);
 };
  
 
@@ -266,15 +263,6 @@ Game.prototype.checkForWinner = function(index) {
     userHash[this.playersArray[i].name].emit('winner',win);  
   }
 
-  // for (var j = 0; j < this.playersArray.length ; j++) {
-  //   // It displays cards for all players but the Dealer
-  //   if (this.playersArray[i].name !== "Dealer") {
-  //     userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
-  //   // It displays de first Dealer's card  
-  //     userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
-  //   }
-
-
 };
 
 //-------------- DELAER STATUS -----------------------
@@ -283,8 +271,6 @@ Game.prototype.dealerStatus = function(){
   while (this.dealerUnder17()){
     if (!this.playersArray[this.playersArray.length -1].blackjack()){
       this.deal(this.playersArray.length-1,1); // Check for hit 
-      // console.log("card delt");
-      // console.log(this.playersArray[1].hand);
     }
   }
 };
@@ -312,8 +298,6 @@ Player.prototype.under21 = function() {
 };
 
 Game.prototype.dealerUnder17 =  function() {
-  
-  // return this.playersArray[this.playersArray.length -1].totalhand() < 17;
   return this.playersArray[this.playersArray.length -1].totalValue < 17;
 };
 
@@ -347,14 +331,10 @@ Game.prototype.clearDeck = function(){
     newArr.push(this.currentDeck.cards[i]);
     } 
   }
-  // console.log(this.currentDeck.cards);
 };
 
 
-
-
-// -------------------JOIN GAME  ------------------------------
-
+// -------------------VARIABLES FOR NEW ROUND  ------------------------------
 
 var roomPlayer = [], gameInProcess = false, queue = [], g = null, count2 = 0;
 
@@ -375,10 +355,7 @@ console.log("---------------------------");
   if ((userName) || (roomPlayer.length > 0 && queue.length > 0)){
     
     if (!playerIntheRP()) {
-      
       roomPlayer.unshift(userName);
-      // console.log("RP: ", roomPlayer); 
-
     }
     if (g !== null) {
         
@@ -395,11 +372,9 @@ console.log("---------------------------");
             g.playersArray.splice(-1,0,(queue[i]));
           }
           g.reset();
-
           g.setUpRound();
         }
     } else {
-      // console.log("358 RP - Start game is about to be called: ", roomPlayer);
       startGame(roomPlayer);  
       
       //tester------------------tester
@@ -407,7 +382,6 @@ console.log("---------------------------");
         console.log("363 Player Name: "+ g.playersArray[j].name);
       }
       //tester------------------tester ends
-      
       g.setUpRound();    
     }
   }
@@ -511,17 +485,13 @@ Game.prototype.hit = function(){
   }
   //tester------------------tester ends
 
-
-  //----Does the hit function
   if (this.playersArray[this.turn].busted()) {
     this.playersArray[this.turn].status = "Busted";
     clearTimeout(this.timerPlay);
     clearInterval(this.intervalId);
     this.stand(); 
   }else {
-    // console.log(this.timerPlay)
     clearTimeout(this.timerPlay);
-    // count1=21;
     clearInterval(this.intervalId);
     this.playTimer();  
   } 
@@ -561,9 +531,6 @@ Game.prototype.finishHand = function() {
   // this.invitePlayers();
   // invitePlayersForAnotherRound();------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   var finishTimer = setTimeout(function(){  
-    // for (var i = 0; i < g.playersArray.length; i++) {
-      // if (g.playersArray[i].money > 0) {}; 
-    // };
     io.emit('delete finish timer');
     _this.cleanTimer =  clearInterval(_this.finishIntervalId);
     for (var i = 0; i < _this.playersArray.length -1; i++) {
@@ -591,8 +558,6 @@ Game.prototype.finishCallCounter = function(){
 };
 
 
-
-
 Game.prototype.logOut = function () {
   if (this.roomPlayer.length === 1 ) {
     g = null;
@@ -603,7 +568,6 @@ Game.prototype.logOut = function () {
   for (var j = 0; j < playersArray.length; j++) {
     playersArray.splice(playersArray[j],1);
   }
-  
 };
 
 
@@ -624,10 +588,7 @@ Game.prototype.reset = function(){
    
  
 
-//  Kick bastards out of the game
-//  Change userName for the right syntax
-// Camilo Added --> Player --> this.status --> "New Player", "Your this.turn", "Hit", "Stand", "Busted", "Joined next hand"
-
+//  Take players out of the game
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
