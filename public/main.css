@@ -71,8 +71,16 @@
 .time {
    color: white;
    position: relative;
-   bottom: 452px;
-   left: 530px;   
+   bottom: 492px;
+   left: 550px;   
+}
+
+/*----TABLE TIMER----*/
+.turn {
+   color: white;
+   position: relative;
+   bottom: 472px;
+   left: 550px;   
 }
 
 /*-------Dealer------*/

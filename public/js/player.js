@@ -30,22 +30,20 @@ $(document).ready(function() {
   //----------------------SOCKET LISTENERS
 
   socket.on("set time", function(msg){
-    $('#time1').text(msg + " scs");
+    $('#time1').text(msg + " seconds");
     if (msg === 3) {
       $('.hitb').attr("disabled",true);
     }  
   });
 
   socket.on('hide', function(msg){
-          $('.hitb').attr("disabled",true);
           $('.standb').attr("disabled",true);
-
+          $('.hitb').attr("disabled",true);
       });
 
   socket.on('show', function(){
           $('.hitb').attr("disabled",false);
           $('.standb').attr("disabled",false);
-          console.log("works 1");
       });
 
 
@@ -61,6 +59,10 @@ $(document).ready(function() {
    socket.on('wallet', function(money){
       console.log("Wallet is called");
       $('#walletScore').text(money);
+    });
+
+   socket.on('turn', function(name){
+      $('#turn').text(name + "'s turn");
     });
 
    socket.on('delete previous cards', function(cards){

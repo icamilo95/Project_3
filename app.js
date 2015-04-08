@@ -250,15 +250,11 @@ Game.prototype.checkForWinner = function(index) {
       console.log("-------------------------------");
     }
 
-    
   
-    //------------------Displays the money for every player
+    //-------------Displays the money for every player
   for (var i = 0; i < this.playersArray.length -1; i++) {
     userHash[this.playersArray[i].name].emit('wallet',this.playersArray[i].money);  
   }
-
-
-
 
 };
 
@@ -441,7 +437,8 @@ Game.prototype.displayButtonsToPlayer = function() {
 };
 
 Game.prototype.hidePlayerHsButtons = function() {
-  if  (this.playersArray.length -2 >= this.turn){
+  // if  (this.playersArray.length -2 >= this.turn){
+  if (this.playersArray[this.turn].name !== "Dealer") {  
     userHash[this.playersArray[this.turn].name].emit('hide',"HI!!!!!");
   }
 }; 
@@ -449,22 +446,20 @@ Game.prototype.hidePlayerHsButtons = function() {
 
 
 Game.prototype.playTimer = function(){
-
+// Dislpays player's turn
+    io.emit('turn',this.playersArray[this.turn].name);  
   // displayCardsButtons(this.playersArray[this.turn]); --------------------------------(Display on Player Side)
   // Send message to the player --> "Your this.turn and Display Buttons" ---------------(Display on Player Side) 
   this.displayButtonsToPlayer();
-  count1 = 21; // Required dont delete
-  
+  count1 = 20; // Required dont delete
+  //Sets screen timer
   this.intervalTrigger();
   var _this = this;
+  //Sets internal timer for players turn
   this.timerPlay = setTimeout(function(){
-    // console.log("first timer Reached after 2 secs");
     _this.playersArray[_this.turn].status = "Stand";   
     _this.stand();
-
   _this.cleanTimer =  clearInterval(_this.intervalId);
-    // count1 = 11;
-    // console.log("Interval cleared");
   },21000);
 
 };
