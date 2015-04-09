@@ -46,6 +46,7 @@ $('#leaveTableButton').toggle();
   });
   
   socket.on("active players", function(players){
+    $('#currentPlayers').append("Current Players");
     for (var i = 0; i < players.length -1; i++) {
       $('#currentPlayers').append('<li>' + players[i].name + '</li>');
     }

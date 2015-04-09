@@ -210,7 +210,7 @@ Game.prototype.checkForWinner = function(index) {
     } else if (player.totalValue > dealer.totalValue){
         if (player.blackjack()) {
           player.money += (player.bet * 2.5);  
-          player.status = player.name + "wins with BLACKJACK";
+          player.status = player.name + " wins with BLACKJACK";
           console.log("-------------------------------");
           console.log(player.name + " wins with BLACKJACK ");
           console.log("-------------------------------");
