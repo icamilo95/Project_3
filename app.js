@@ -195,14 +195,14 @@ Game.prototype.checkForWinner = function(index) {
     // Player busted  
     if (player.totalValue > 21) {
         player.bet = 0;
-        win += ("- " + player.name + " Busted - ");
+        player.status = player.name + " Busted";
         console.log("-------------------------------");
         console.log(player.name + " Busted");
         console.log("-------------------------------");
     // Dealer Wins with BlackJack   
     } else if (dealer.blackjack() && !(player.blackjack())) {
       player.bet = 0;
-      win += "- Dealer wins with BLACKJACK - ";
+      player.status = " Dealer wins with BLACKJACK ";
       console.log("-------------------------------");
       console.log("Dealer wins with BLACKJACK");
       console.log("-------------------------------");
@@ -210,13 +210,13 @@ Game.prototype.checkForWinner = function(index) {
     } else if (player.totalValue > dealer.totalValue){
         if (player.blackjack()) {
           player.money += (player.bet * 2.5);  
-          win += " - " + player.name + " wins with BLACKJACK - ";
+          player.status = player.name + "wins with BLACKJACK";
           console.log("-------------------------------");
           console.log(player.name + " wins with BLACKJACK ");
           console.log("-------------------------------");
         } else {
           player.money += (player.bet * 2);  
-          win += " - " + player.name + " wins - ";
+          player.status = player.name + " wins ";
           console.log("-------------------------------");
           console.log(player.name + " wins");
           console.log("-------------------------------");
@@ -227,14 +227,14 @@ Game.prototype.checkForWinner = function(index) {
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue > 21)) {
       player.money += (player.bet * 2);
       player.bet = 0;  
-      win += " - " + player.name +" wins - Dealer Busted - ";
+      player.status = player.name +" wins - Dealer Busted ";
       console.log("-------------------------------");
       console.log(player.name +" wins - Dealer Busted");
       console.log("-------------------------------");
     // Dealer Win   
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue < 22)){
       player.bet = 0;
-      win = " - Dealer Wins -";
+      player.status = "Dealer Wins ";
       console.log("-------------------------------");
       console.log("Dealer Wins ");
       console.log("-------------------------------");
@@ -242,14 +242,14 @@ Game.prototype.checkForWinner = function(index) {
     } else if (player.totalValue === dealer.totalValue) {
       if (player.blackjack() && !dealer.blackjack()) {
         player.money += (player.bet * 2.5);  
-        win = " - " + player.name +" wins with BJ and Dealer only 21 - ";
+        player.status = player.name +" wins with BJ and Dealer only 21 ";
         console.log("-------------------------------");
         console.log( player.name +" wins with BJ and Dealer only 21");    
         console.log("-------------------------------");
       } 
       player.totalValue += player.bet;  
       player.bet = 0;
-      win = " - Tie Game - ";
+      player.status = "Tie Game";
       console.log("-------------------------------");
       console.log("Tie Game");
       console.log("-------------------------------");
@@ -260,7 +260,7 @@ Game.prototype.checkForWinner = function(index) {
   for (var i = 0; i < this.playersArray.length -1; i++) {
     userHash[this.playersArray[i].name].emit('wallet',this.playersArray[i].money);  
     userHash[this.playersArray[i].name].emit("rest of dealers cards", this.playersArray[this.playersArray.length -1].hand);
-    userHash[this.playersArray[i].name].emit('winner',win);  
+    userHash[this.playersArray[i].name].emit('winner',this.playersArray[i].status);  
   }
 
 };
@@ -580,9 +580,12 @@ Game.prototype.logOut = function () {
   for (var j = 0; j < this.playersArray.length; j++) {
     this.playersArray.splice(this.playersArray[j],1);
   }
+  console.log("users on PA: ", this.playersArray);
   if (roomPlayer.length === 1 ) {
-    console.log("got the null");
+    this.playersArray = [];
     g = null;
+    clearTimeout(this.finishTimer);
+    console.log("got the null");
   }
 };
 

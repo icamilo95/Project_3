@@ -63,13 +63,11 @@ $('#leaveTableButton').toggle();
           $('.standb').attr("disabled",false);
       });
 
-
    socket.on('cards', function(cards){
       for (var i=0;i < cards.length;i++){
       var val_1 = cards[i].rank + " of " + cards[i].suit;
       $('#player_card_'+ (i + 1)).text(val_1);
       $('#player_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
-      
       }
     });
 
