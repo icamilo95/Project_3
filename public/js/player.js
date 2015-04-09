@@ -64,6 +64,12 @@ $('#leaveTableButton').toggle();
           $('.standb').attr("disabled",false);
       });
 
+  socket.on('turn off join game', function(){
+          $('#joinGameButton').toggle();
+          
+      });
+
+
    socket.on('cards', function(cards){
       for (var i=0;i < cards.length;i++){
       var val_1 = cards[i].rank + " of " + cards[i].suit;

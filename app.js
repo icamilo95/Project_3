@@ -531,7 +531,7 @@ Game.prototype.finishHand = function() {
   _this = this;
   count2 = 10;
   this.finishIntervalTrigger();
-
+  io.emit('turn off join game');
   this.invitePlayersForAnotherRound();//------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   //--- Next Timer sets up 10 sec before the next round 
   var finishTimer = setTimeout(function(){  
@@ -543,9 +543,9 @@ Game.prototype.finishHand = function() {
     _this.cleanTimer =  clearInterval(_this.finishIntervalId);
   // Next lines remove previos set of cards from the table  
     for (var i = 0; i < _this.playersArray.length -1; i++) {
-    userHash[_this.playersArray[i].name].emit('delete previous cards',_this.playersArray[i].hand);
-    io.emit('delete winner message');
-  }
+      userHash[_this.playersArray[i].name].emit('delete previous cards',_this.playersArray[i].hand);
+      
+    }
 
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
