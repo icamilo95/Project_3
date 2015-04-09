@@ -7,132 +7,172 @@
 }
 
 #joinGame {
-   position: relative;
-   bottom: 830px;
-   left: 63px;
+   position: absolute;
+   top: 30px;
+   left: 93px;
 }
 
-/*-------Player------*/
+
+/*-------CONTAINER------*/
+.container{
+   height: 700px;
+}
+
+/*-------Player Buttons------*/
 #hit {
-   position: relative;
-   bottom: 50px;
-   left: 423px;
+   position: absolute;
+   top: 555px;
+   left: 523px;
 }
 
 #stand {
-   position: relative;
-   bottom: 90px;
-   left: 533px;
+   position: absolute;
+   top: 555px;
+   left: 630px;
 }
 
 #walletScore {
    color: white;
-   position: relative;
-   bottom: 112px;
-   left: 673px;
+   position: absolute;
+   top: 565px;
+   left: 773px;
 
 }
 
 /*----PLAYER CARDS----*/
 
 #player_card_1 {
-  position: relative;
-  bottom: 350px;
-  left: -100px;   
+   width: 81px; 
+   height: 120px;
+  position: absolute;
+  top: 360px;
+  left: 400px;   
   
 }
 
 #player_card_2 {
-   
-   position: relative;
-   bottom: 350px;
-   left: -100px;   
+   width: 81px; 
+   height: 120px;   
+   position: absolute;
+   top: 360px;
+   left: 490px;   
 }
 
 #player_card_3 {
-   position: relative;
-   bottom: 350px;
-   left: -100px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 360px;
+   left: 580px;   
 }
 
 #player_card_4 {
-   position: relative;
-   bottom: 350px;
-   left: -100px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 360px;
+   left: 670px;   
 }
 
 #player_card_5 {
-   position: relative;
-   bottom: 350px;
-   left: -100px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 360px;
+   left: 760px;   
 }
 
 /*----TABLE TIMER----*/
 .time {
    color: white;
-   position: relative;
-   bottom: 492px;
-   left: 550px;   
+   position: absolute;
+   top: 500px;
+   left: 630px;   
 }
 
-/*----TURN ----*/
+/*----PALYER'S TURN ----*/
 .turn {
    color: white;
-   position: relative;
-   bottom: 372px;
-   left: 550px;   
+   position: absolute;
+   top: 500px;
+   left: 530px;   
 }
 
 /*----WINNER MESSAGE----*/
 #winnerMessage {
    color: white;
-   position: relative;
-   bottom: 530px;
-   left: 550px;   
+   position: absolute;
+   top: 300px;
+   left: 450px;
+   font-size: 20px;  
+}
+
+/*----LEAVE TABLE----*/
+#leaveTable {
+   position: absolute;
+   top: 360px;
+   left: 220px;    
 }
 
 /*----NEXT ROUND TIMER----*/
 #finalTimer {
    color: white;
-   position: relative;
-   bottom: 730px;
-   left: 530px;   
+   position: absolute;
+   top: 420px;
+   left: 160px;
+   font-size: 20px;     
+}
+
+/*----LIST OF PLAYERS ON THE TABLE----*/
+#currentPlayers {
+   color: white;
+   position: absolute;
+   top: 150px;
+   left: 93px;  
 }
 
 /*-------Dealer------*/
 
 #dealer_card_1 {
-   position: relative;
-   bottom: 562px;
-   left: 330px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 160px;
+   left: 400px;   
+   border-style: none; 
 }
 
 #dealer_card_2 {
-   color: white;
-   position: relative;
-   bottom: 562px;
-   left: 330px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 160px;
+   left: 490px;    
+   border-style: dotted; 
 }
 
 #dealer_card_3 {
-   color: white;
-   position: relative;
-   bottom: 562px;
-   left: 330px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 160px;
+   left: 580px;   
 }
 
 #dealer_card_4 {
-   color: white;
-   position: relative;
-   bottom: 562px;
-   left: 330px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 160px;
+   left: 670px;   
 }
 
 #dealer_card_5 {
-   color: white;
-   position: relative;
-   bottom: 562px;
-   left: 330px;   
+   width: 81px; 
+   height: 120px;
+   position: absolute;
+   top: 160px;
+   left: 760px;   
 }
 
 /*.dealer_card_1 {
