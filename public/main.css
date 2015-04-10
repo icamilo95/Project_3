@@ -131,6 +131,15 @@
    left: 93px;  
 }
 
+/*----PLAYER THAT JOINS THE NEXT ROUND----*/
+#joinedTheGame {
+   color: white;
+   position: absolute;
+   top: 125px;
+   left: 93px;  
+}
+
+
 /*-------Dealer------*/
 
 #dealer_card_1 {

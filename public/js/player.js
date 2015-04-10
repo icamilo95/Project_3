@@ -138,7 +138,7 @@ $('#leaveTableButton').toggle();
    socket.on('delete winner message', function(message){
       $('#winnerMessage').text(" ");
       $('#currentPlayers').empty();
-      console.log("Reached current players ()()()()()()(");
+      $('#joinedTheGame').empty();
     }); 
 
 
@@ -155,6 +155,11 @@ $('#leaveTableButton').toggle();
     console.log("Got it for this player, deleting " );
     
   });
+
+  socket.on('player joined next hand', function(name){
+      $('#joinedTheGame').text(name + " joined next round");
+    }); 
+  
 
   //----------------------SOCKET OTHER
 

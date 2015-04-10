@@ -369,7 +369,7 @@ console.log("---------------------------");
         if (gameInProcess === true) {
           console.log("342 gameInProcess-------------- ", gameInProcess);
           queue.push(new Player(userName, "Joined next hand"));
-          // io.emit('player joined next hand', gsio..playersArray[cont].status);
+          io.emit('player joined next hand', queue[queue.length-1].name);
 
  // Send message to the player --> "Joined the next hand" ---------------(Display on Player Side)
 
