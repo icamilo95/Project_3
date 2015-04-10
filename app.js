@@ -529,12 +529,10 @@ Game.prototype.nextTurn = function(){
     }
   this.finishHand();
   }
-  gameInProcess = false;
 };
 
 
 Game.prototype.finishHand = function() {
-  gameInProcess = false;
   _this = this;
   count2 = 10;
   this.finishIntervalTrigger();
@@ -542,8 +540,8 @@ Game.prototype.finishHand = function() {
   this.invitePlayersForAnotherRound();//------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   //--- Next Timer sets up 10 sec before the next round 
   var finishTimer = setTimeout(function(){  
+  gameInProcess = false;
   // next line emits command to delete the timer message  
-
     io.emit('delete finish timer');
   // next line deletes "play again" message from screen
     io.emit("play again");
@@ -552,7 +550,7 @@ Game.prototype.finishHand = function() {
   // Next lines remove previos set of cards from the table  
     for (var i = 0; i < _this.playersArray.length -1; i++) {
       userHash[_this.playersArray[i].name].emit('delete previous cards',_this.playersArray[i].hand);
-      
+       io.emit('delete winner message');
     }
 
     if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
@@ -566,6 +564,7 @@ Game.prototype.finishIntervalTrigger = function(){
   var _this = this;
   this.finishIntervalId = setInterval(function() {
     _this.finishCallCounter();
+    io.emit('turn off join game');
   },1000);
 };
 
@@ -574,6 +573,8 @@ Game.prototype.finishCallCounter = function(){
   count2 -= 1;
   io.emit("set finish time", count2 );
 };
+
+
 
 
 Game.prototype.invitePlayersForAnotherRound = function(){
@@ -673,16 +674,22 @@ var userHash = {};
       console.log(g.playersArray[g.turn].bet);
       console.log('-------------------');
     });
+    
+
     socket.on("disconnect", function(){
       function matchesName(array, nameToCheck) {
         for (var i=0; i>array.length; i++){
           if (array[i].name === nameToCheck){
-            return i
+            return i;
           }
         }
 
       }
-      g.playersArray.splice(matchesName(g.playersArray), 1);
+      //Camilo test
+      if (g !== null) {
+       g.playersArray.splice(matchesName(g.playersArray), 1); 
+      }
+      // g.playersArray.splice(matchesName(g.playersArray), 1);
     });
 });
 

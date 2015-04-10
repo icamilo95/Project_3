@@ -41,16 +41,12 @@ $('#leaveTableButton').toggle();
 
   socket.on("set time", function(msg){
     $('#time1').text(" -  " + msg + " seconds");
-    // if (msg === 3) {
-    //   $('.hitb').attr("disabled",true);
-    // }
   });
 
   socket.on("set finish time", function(msg){
     $('#finalTimer').text("Next round in "+ msg + " seconds");
   });
-<<<<<<< HEAD
-=======
+
   
   socket.on("active players", function(players){
     $('#currentPlayers').append("Current Players");
@@ -60,8 +56,6 @@ $('#leaveTableButton').toggle();
   });
 
 
->>>>>>> 0b4b731709c8a26aa6a49918d883c8899f8b59f7
-
   socket.on('hide', function(msg){
     $('.standb').attr("disabled",true);
     $('.hitb').attr("disabled",true);
@@ -69,7 +63,7 @@ $('#leaveTableButton').toggle();
   });
 
   socket.on('show', function(){
-<<<<<<< HEAD
+// <<<<<<< HEAD
     $('.hitb').attr("disabled",false);
     $('.standb').attr("disabled",false);
     $('.betb').attr("disabled",false);
@@ -83,25 +77,30 @@ $('#leaveTableButton').toggle();
       
     }
   });
-=======
-          $('.hitb').attr("disabled",false);
-          $('.standb').attr("disabled",false);
-      });
+// =======
+//           $('.hitb').attr("disabled",false);
+//           $('.standb').attr("disabled",false);
+//       });
 
   socket.on('turn off join game', function(){
-          $('#joinGameButton').toggle();
-          
-      });
+          $('#joinGameButton').attr(disabled,true);
+          console.log("got it papi");
+          // $('#joinGameButton').toggle();
+  });
 
+  socket.on('turn on join game', function(){
+          $('#joinGameButton').attr(disabled,false);
+          // $('#joinGameButton').toggle();
+  });
 
-   socket.on('cards', function(cards){
-      for (var i=0;i < cards.length;i++){
-      var val_1 = cards[i].rank + " of " + cards[i].suit;
-      $('#player_card_'+ (i + 1)).text(val_1);
-      $('#player_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
-      }
-    });
->>>>>>> 0b4b731709c8a26aa6a49918d883c8899f8b59f7
+//    socket.on('cards', function(cards){
+//       for (var i=0;i < cards.length;i++){
+//       var val_1 = cards[i].rank + " of " + cards[i].suit;
+//       $('#player_card_'+ (i + 1)).text(val_1);
+//       $('#player_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
+//       }
+//     });
+// >>>>>>> 0b4b731709c8a26aa6a49918d883c8899f8b59f7
 
   socket.on('card_1_Dealer', function(cards){
     var val_1 = cards[0].rank + " of " + cards[0].suit;
@@ -122,26 +121,16 @@ $('#leaveTableButton').toggle();
   }); 
   
 
-<<<<<<< HEAD
-  socket.on('wallet', function(money){
-    console.log("Wallet is called");
-    $('#walletScore').text(money);
-  });
-=======
+
    socket.on('wallet', function(money){
       $('#walletScore').text('$ ' + money);
     });
->>>>>>> 0b4b731709c8a26aa6a49918d883c8899f8b59f7
 
   socket.on('turn', function(name){
     $('#turn').text(name + "'s turn");
   });
 
-<<<<<<< HEAD
-  socket.on('delete winner message', function(message){
-    $('#winnerMessage').text(" ");
-  }); 
-=======
+
    socket.on('play again', function(){
       $('#leaveTableButton').toggle();
     }); 
@@ -149,8 +138,9 @@ $('#leaveTableButton').toggle();
    socket.on('delete winner message', function(message){
       $('#winnerMessage').text(" ");
       $('#currentPlayers').empty();
+      console.log("Reached current players ()()()()()()(");
     }); 
->>>>>>> 0b4b731709c8a26aa6a49918d883c8899f8b59f7
+
 
   socket.on('delete finish timer', function(message){
     $('#finalTimer').text(" ");
