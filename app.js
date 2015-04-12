@@ -365,7 +365,7 @@ Game.prototype.checkForCurrentPlayers = function (){
     for (var i = 0; i < this.playersArray.length -1; i++) {
 	if (this.playersArray[i].logged === "No") {
 	    this.playersArray.splice(i, 1);
-	    tmpName = this.playersArray[i].name;
+	    // tmpName = this.playersArray[i].name;
 	}
     }
     // for (var j = 0; j < roomPlayer.length -1; j++) {
@@ -658,9 +658,12 @@ io.on('connection', function(socket){
 		} else{
 		    for (var i = 0; i < queue.length; i++) {
 			// console.log("350 Splice is about to be called: ", queue[i]);
+			console.log("queue before splice into PA:  ", queue)
 			g.playersArray.splice(-1,0,(queue[i]));
+			console.log("queue before reset, after splice into PA:  ", queue)
 		    }
 		    g.reset();
+		    console.log("queue after reset:  ", queue)
 		    g.checkForCurrentPlayers();
 		    if (g !== null) {
 			g.setUpRound();
