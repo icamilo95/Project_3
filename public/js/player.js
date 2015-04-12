@@ -139,9 +139,9 @@ $('#leaveTableButton').toggle();
   });
 
 
-   socket.on('play again', function(){
-      $('#leaveTableButton').toggle();
-    }); 
+   // socket.on('play again', function(){
+   //    $('#leaveTableButton').toggle();
+   //  }); 
 
    socket.on('delete winner message', function(message){
       $('#winnerMessage').text(" ");

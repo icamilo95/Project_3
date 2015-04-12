@@ -195,8 +195,8 @@ Game.prototype.checkForWinner = function(index) {
     var dealer = this.playersArray[this.playersArray.length-1];
     var player = this.playersArray[index];
     // console.log(player.name + " Hand : " + player.hand);
-    // console.log("Dealer Hand : " + dealer.hand);
-    // console.log("Dealer Total: " , dealer.totalValue);
+    console.log("Dealer Hand : " + dealer.hand);
+    console.log("Dealer Total: " , dealer.totalValue);
     // Player busted
     if (player.totalValue > 21) {
 	player.bet = 0;
@@ -357,24 +357,68 @@ var startGame = function(array){
 };
 
 
+var joinGame = function() {
+    console.log("---------------------------");
+    console.log("         New Round         ");
+    console.log("---------------------------");
+    // console.log("328 People in the RP : ", roomPlayer);
+    // console.log("329 People in the queue : ", queue);
 
+    if ((userName) || (roomPlayer.length > 0 && queue.length > 0)){
 
+	if (!playerIntheRP()) {
+	    roomPlayer.unshift(userName);
+	}
+	if (g !== null) {
+
+	    if (gameInProcess === true) {
+		console.log("342 gameInProcess-------------- ", gameInProcess);
+		queue.push(new Player(userName, "Joined next hand"));
+		io.emit('player joined next hand', queue[queue.length-1].name);
+
+		// Send message to the player --> "Joined the next hand" ---------------(Display on Player Side)
+
+	    } else{
+		for (var i = 0; i < queue.length; i++) {
+		    // console.log("350 Splice is about to be called: ", queue[i]);
+		    g.playersArray.splice(-1,0,(queue[i]));
+		}
+		g.reset();
+		g.checkForCurrentPlayers();
+		if (g !== null) {
+		    g.setUpRound();
+		}
+
+	    }
+	} else {
+	    startGame(roomPlayer);
+
+	    //tester------------------tester
+	    for (var j = 0; j < g.playersArray.length ; j++) {
+		console.log("363 Player Name: "+ g.playersArray[j].name);
+	    }
+	    //tester------------------tester ends
+	    g.setUpRound();
+	}
+    }
+};
+
+var playerIntheRP = function(){
+    for (var i = 0; i < roomPlayer.length; i++) {
+	if (roomPlayer[i] === userName) {
+	    console.log("369 UserName in playerIntheRP: ",userName);
+	    return true;
+	}
+    }
+    return false;
+};
 
 Game.prototype.checkForCurrentPlayers = function (){
-    var tmpName = "";
     for (var i = 0; i < this.playersArray.length -1; i++) {
 	if (this.playersArray[i].logged === "No") {
 	    this.playersArray.splice(i, 1);
-	    tmpName = this.playersArray[i].name;
 	}
     }
-    // for (var j = 0; j < roomPlayer.length -1; j++) {
-    //   if (roomPlayer[i] === tmpName) {
-    //     console.log("VaR TEMP", tmpName);
-    //     roomPlayer.splice(i,1);
-    //   }
-    // }
-
     if (this.playersArray.length-1 === 0) {
 	console.log("Sole el delaer, se acaba el juego");
 	g = null;
@@ -387,11 +431,6 @@ Game.prototype.checkForCurrentPlayers = function (){
 // ------------------- PLAY ROUND  -------------------------------
 
 Game.prototype.setUpRound = function(){
-
-    for (var j = 0; j < roomPlayer.length; j++) {
-	console.log("RP:::::: ",roomPlayer[j]);
-    }
-
 
     gameInProcess = true;
     g.initialDeal();
@@ -408,16 +447,13 @@ Game.prototype.setUpRound = function(){
 
 
 	//tester------------------tester
-	// console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
-	// console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
+	console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
+	console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
     }
     //tester------------------tester ends
 
     // Next line shows all the players on the table
     io.emit ('active players', this.playersArray);
-
-
-
 
 };
 
@@ -478,8 +514,8 @@ Game.prototype.hit = function(){
 
     //tester------------------tester
     for (var i = 0; i < this.playersArray.length -1; i++) {
-	// console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
-	// console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
+	console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
+	console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
 	userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
     }
     //tester------------------tester ends
@@ -542,9 +578,9 @@ Game.prototype.finishHand = function() {
 	    io.emit('delete winner message');
 	}
 
-	// if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
-	joinGame();
-	// }
+	if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
+	    joinGame();
+	}
     },10000);
 };
 
@@ -631,76 +667,15 @@ app.get('/blackjack', function(req, res){
 // ---------------------LISTENERS
 var userHash = {};
 io.on('connection', function(socket){
-    socket.nickname = userName;
-
-    joinGame = function() {
-	console.log("---------------------------");
-	console.log("         New Round         ");
-	console.log("---------------------------");
-	// console.log("328 People in the RP : ", roomPlayer);
-	// console.log("329 People in the queue : ", queue);
-
-	if ((socket.nickname) || (roomPlayer.length > 0 && queue.length > 0)){
-
-	    if (!playerIntheRP()) {
-		roomPlayer.unshift(socket.nickname);
-		console.log("User name", socket.nickname);
-	    }
-	    if (g !== null) {
-
-		if (gameInProcess === true) {
-		    console.log("342 gameInProcess-------------- ", gameInProcess);
-		    queue.push(new Player(socket.nickname, "Joined next hand"));
-		    io.emit('player joined next hand', queue[queue.length-1].name);
-
-		    // Send message to the player --> "Joined the next hand" ---------------(Display on Player Side)
-
-		} else{
-		    for (var i = 0; i < queue.length; i++) {
-			// console.log("350 Splice is about to be called: ", queue[i]);
-			g.playersArray.splice(-1,0,(queue[i]));
-		    }
-		    g.reset();
-		    g.checkForCurrentPlayers();
-		    if (g !== null) {
-			g.setUpRound();
-		    }
-
-		}
-	    } else {
-		startGame(roomPlayer);
-
-		//tester------------------tester
-		for (var j = 0; j < g.playersArray.length ; j++) {
-		    console.log("363 Player Name: "+ g.playersArray[j].name);
-		}
-		//tester------------------tester ends
-		g.setUpRound();
-	    }
-	}
-    };
-
-
-    var playerIntheRP = function(){
-	for (var i = 0; i < roomPlayer.length; i++) {
-	    if (roomPlayer[i] === socket.nickname) {
-		console.log("369 socket.nickname in playerIntheRP: ",socket.nickname);
-		return true;
-	    }
-	}
-	return false;
-    };
-
-
-
     socket.on("join game", function(){
 	console.log("Its connecting");
 	joinGame();
     });
-
+    socket.nickname = userName;
     // console.log(userName)
-    userHash[socket.nickname] = socket;
+    userHash[userName] = socket;
     // console.log(userHash["nick"])
+    userHash[userName].emit("hello world", "hello world " + userName );
     // --------TEST -----------------
     // io.emit("set time", count1 );
     // console.log("Timer Camilo", timeTest());
@@ -713,7 +688,8 @@ io.on('connection', function(socket){
     });
 
     socket.on("leave the table", function(){
-	g.logOut(socket.nickname);
+
+	g.logOut(userName);
 
     });
     // bet logic goes here:
@@ -727,11 +703,11 @@ io.on('connection', function(socket){
 
 
     socket.on("disconnect", function(){
+
 	console.log("Retirado",userName);
-	console.log("Retirado socket",socket.nickname);
 	if (g !== null) {
 	    for (var i = 0; i < g.playersArray.length -1; i++) {
-		if (g.playersArray[i].name === socket.nickname) {
+		if (g.playersArray[i].name === userName) {
 		    g.playersArray[i].logged = "No";
 		    console.log(g.playersArray[i].name);
 		}
@@ -739,12 +715,27 @@ io.on('connection', function(socket){
 	    }
 	}
 
-	for (var j = 0; j < roomPlayer.length; j++) {
-	    if (roomPlayer[j] === socket.nickname) {
-		roomPlayer.splice(j,1);
-	    }
 
-	}
+	// function matchesName(array, nameToCheck) {
+	//   // console.log("CAMILO HERE HERE",array);
+	//   // console.log("EL otro ", nameToCheck);
+	//   console.log("EL otro 2", userName);
+
+	//   for (var i=0; i > array.length; i++){
+	//     if (array[i].name === userName){
+	//         g.playersArray[i].status = "retired";
+	//         console.log("Retirado" , g.playersArray[i].status);
+	//       // return i;
+	//     }
+	//   }
+
+	// }
+	// //Camilo test
+	// if (g !== null) {
+	//   console.log("Probando ", matchesName);
+	//  g.playersArray.splice(matchesName(g.playersArray), 1);
+	// }
+	// g.playersArray.splice(matchesName(g.playersArray), 1);
     });
 });
 
@@ -771,6 +762,7 @@ app.post("/newuser", function(req, res){
 //validates userPass === userName and logs in
 app.post("/blackjack", function(req, res){
     var getUserPass = function(){
+	console.log("client", client);
 	client.HGET("users", req.body.userName, function(err, reply){
 	    if (err){
 		console.log("Could not query the database");
@@ -785,7 +777,6 @@ app.post("/blackjack", function(req, res){
     };
     getUserPass();
 });
-
 
 // ---------------------START THE SERVER --------------------
 http.listen(process.env.PORT || 3000)
