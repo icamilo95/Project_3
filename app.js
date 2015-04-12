@@ -771,7 +771,7 @@ app.post("/newuser", function(req, res){
 //validates userPass === userName and logs in
 app.post("/blackjack", function(req, res){
     var getUserPass = function(){
-	client.HGET("users", req.body.userName, function(err, reply){
+	clientHGET("users", req.body.userName, function(err, reply){
 	    if (err){
 		console.log("Could not query the database");
 	    }
@@ -789,6 +789,6 @@ app.post("/blackjack", function(req, res){
 
 
 // ---------------------START THE SERVER --------------------
-http.listen(process.env.PORT || 5000)
+http.listen(process.env.PORT || 3000)
 // ---------------------NOTHING AFTER THIS --------------------
 
