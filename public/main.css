@@ -139,6 +139,13 @@
    left: 93px;  
 }
 
+/*----TOTAL PLAYER'S HAND----*/
+#totalHandPlayer {
+   color: white;
+   position: absolute;
+   top: 415px;
+   left: 873px;  
+}
 
 /*-------Dealer------*/
 
@@ -165,7 +172,8 @@
    height: 120px;
    position: absolute;
    top: 160px;
-   left: 580px;   
+   left: 580px;  
+   border-style: none; 
 }
 
 #dealer_card_4 {
@@ -181,12 +189,8 @@
    height: 120px;
    position: absolute;
    top: 160px;
-   left: 760px;   
-   
-   
+   left: 760px;      
 }
 
-/*.dealer_card_1 {
-   background-image: url("/img/10_of_clubs.png");
-}*/
+
 

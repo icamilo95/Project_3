@@ -85,6 +85,7 @@ var Player = function(name, status){
     this.aceCounter = 0;
     this.bet = 10;
     this.status = "New PLayer";
+    this.logged = "Yes";
 };
 
  Player.prototype.totalhand = function(){ 
@@ -379,7 +380,11 @@ console.log("---------------------------");
             g.playersArray.splice(-1,0,(queue[i]));
           }
           g.reset();
-          g.setUpRound();
+          g.checkForCurrentPlayers();
+          if (g !== null) {
+            g.setUpRound();
+          }
+          
         }
     } else {
       startGame(roomPlayer);
@@ -404,6 +409,21 @@ var playerIntheRP = function(){
   return false;
 };
 
+Game.prototype.checkForCurrentPlayers = function (){
+  for (var i = 0; i < this.playersArray.length -1; i++) {
+    if (this.playersArray[i].logged === "No") {
+      this.playersArray.splice(i, 1); 
+    } 
+  }
+  if (this.playersArray.length-1 === 0) {
+    console.log("Sole el delaer, se acaba el juego");
+    g = null;
+    this.playersArray = [];
+  }
+  console.log(" 415 Players for the next Round " + this.playersArray);
+};
+
+
 // ------------------- PLAY ROUND  -------------------------------
 
 Game.prototype.setUpRound = function(){
@@ -416,9 +436,11 @@ Game.prototype.setUpRound = function(){
     // It displays cards for all players but the Dealer
     if (this.playersArray[i].name !== "Dealer") {
       userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
+      userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
     // It displays de first Dealer's card
       userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
     }
+
 
   //tester------------------tester
     console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
@@ -453,9 +475,7 @@ Game.prototype.hidePlayerHsButtons = function() {
 
 Game.prototype.playTimer = function(){
 // Dislpays player's turn
-    io.emit('turn',this.playersArray[this.turn].name);
-  // displayCardsButtons(this.playersArray[this.turn]); --------------------------------(Display on Player Side)
-  // Send message to the player --> "Your this.turn and Display Buttons" ---------------(Display on Player Side) 
+  io.emit('turn',this.playersArray[this.turn].name);
   this.displayButtonsToPlayer();
   count1 = 20; // Required dont delete
   //Sets screen timer
@@ -492,6 +512,7 @@ Game.prototype.hit = function(){
   for (var i = 0; i < this.playersArray.length -1; i++) {
     console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
     console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
+    userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
 
@@ -581,21 +602,21 @@ Game.prototype.invitePlayersForAnotherRound = function(){
   io.emit("play again");
 };
 
-Game.prototype.logOut = function () {
-  
-  for (var i = 0; i < roomPlayer.length; i++) {
-    roomPlayer.splice(roomPlayer[i],1);
+Game.prototype.logOut = function (name) {
+  // for (var i = 0; i < roomPlayer.length; i++) {
+    // roomPlayer.splice(roomPlayer[i],1);
+  // }
+  for (var i = 0; i < this.playersArray.length; i++) {
+    if (this.playersArray[i].name === name) {
+    this.playersArray[i].logged = "No";  
+    }
   }
-  for (var j = 0; j < this.playersArray.length; j++) {
-    this.playersArray.splice(this.playersArray[j],1);
-  }
-  console.log("users on PA: ", this.playersArray);
-  if (roomPlayer.length === 1 ) {
-    this.playersArray = [];
-    g = null;
-    clearTimeout(this.finishTimer);
-    console.log("got the null");
-  }
+  console.log("users on PA after Log out: ", this.playersArray);
+  // if (roomPlayer.length === 1 ) {
+    // this.playersArray = [];
+    // g = null;
+    // clearTimeout(this.finishTimer);
+  // }
 };
 
 
@@ -635,7 +656,7 @@ app.get('/blackjack', function(req, res){
   res.render('blackjack');
 
 userName = req.cookies['username'];
-// console.log("UserName", userName);
+console.log("UserName", userName);
 });
 
 
@@ -663,7 +684,8 @@ var userHash = {};
     });
 
     socket.on("leave the table", function(){
-      g.logOut();
+      
+      g.logOut(userName);
 
     });
     // bet logic goes here:
@@ -677,18 +699,38 @@ var userHash = {};
     
 
     socket.on("disconnect", function(){
-      function matchesName(array, nameToCheck) {
-        for (var i=0; i>array.length; i++){
-          if (array[i].name === nameToCheck){
-            return i;
-          }
-        }
-
-      }
-      //Camilo test
+      
+      console.log("Retirado",userName);
       if (g !== null) {
-       g.playersArray.splice(matchesName(g.playersArray), 1); 
-      }
+        for (var i = 0; i < g.playersArray.length -1; i++) {
+          if (g.playersArray[i].name === userName) {
+            g.playersArray[i].logged = "No";
+            console.log(g.playersArray[i].name);
+          }
+          
+        }
+      }    
+
+
+      // function matchesName(array, nameToCheck) {
+      //   // console.log("CAMILO HERE HERE",array);
+      //   // console.log("EL otro ", nameToCheck);
+      //   console.log("EL otro 2", userName);
+        
+      //   for (var i=0; i > array.length; i++){
+      //     if (array[i].name === userName){
+      //         g.playersArray[i].status = "retired"; 
+      //         console.log("Retirado" , g.playersArray[i].status);
+      //       // return i;
+      //     }
+      //   }
+
+      // }
+      // //Camilo test
+      // if (g !== null) {
+      //   console.log("Probando ", matchesName);
+      //  g.playersArray.splice(matchesName(g.playersArray), 1); 
+      // }
       // g.playersArray.splice(matchesName(g.playersArray), 1);
     });
 });

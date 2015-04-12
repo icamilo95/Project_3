@@ -16,6 +16,7 @@ $('#leaveTableButton').toggle();
   $('#joinGame').on("submit", function(e){
     socket.emit("join game");
     $('#joinGameButton').attr("disabled",true);
+    console.log("joined the game");
   });
 
 
@@ -77,6 +78,12 @@ $('#leaveTableButton').toggle();
       
     }
   });
+
+  socket.on('total hand', function(totalHand){
+      $('#totalHandPlayer').text("( " + totalHand + " )");
+  });
+
+
 // =======
 //           $('.hitb').attr("disabled",false);
 //           $('.standb').attr("disabled",false);
