@@ -2,8 +2,12 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var redis = require("redis");
-var client = redis.createClient();
+var redis = require('redis');
+var url = require('url');
+var redisURL = url.parse(process.env.REDISCLOUD_URL);
+var client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
+client.auth(redisURL.auth.split(":")[1]);
+
 var methodOverride = require("method-override");
 var bodyParser = require("body-parser");
 var cookieParser = require('cookie-parser');
