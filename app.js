@@ -525,7 +525,7 @@ Game.prototype.finishHand = function() {
     _this = this;
     count2 = 10;
     this.finishIntervalTrigger();
-    io.emit('turn off join game');
+    // io.emit('turn off join game');
     this.invitePlayersForAnotherRound();//------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
     //--- Next Timer sets up 10 sec before the next round
     var finishTimer = setTimeout(function(){
