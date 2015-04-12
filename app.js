@@ -412,6 +412,7 @@ var startGame = function(array){
 };
 
 
+<<<<<<< HEAD
 var joinGame = function() {
 console.log("---------------------------");
 console.log("         New Round         ");
@@ -447,17 +448,11 @@ console.log("---------------------------");
         }
     } else {
       startGame(roomPlayer);
+=======
+>>>>>>> ccf311836c55a740ab24073c85993548e77a9171
 
-      //tester------------------tester
-      for (var j = 0; j < g.playersArray.length ; j++) {
-        console.log("363 Player Name: "+ g.playersArray[j].name);
-      }
-      //tester------------------tester ends
-      g.setUpRound();
-    }
-  }
-};
 
+<<<<<<< HEAD
 var playerIntheRP = function(){
   for (var i = 0; i < roomPlayer.length; i++) {
       if (roomPlayer[i] === socket.nickname) {
@@ -467,6 +462,8 @@ var playerIntheRP = function(){
   }
   return false;
 };
+=======
+>>>>>>> ccf311836c55a740ab24073c85993548e77a9171
 
 Game.prototype.checkForCurrentPlayers = function (){
   var tmpName = "";
@@ -650,9 +647,9 @@ Game.prototype.finishHand = function() {
        io.emit('delete winner message');
     }
 
-    if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
+    // if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
       joinGame();
-    }
+    // }
   },10000);
 };
 
@@ -722,11 +719,97 @@ Game.prototype.reset = function(){
  // ROUTES AND OTHER THINGS BELOW:
 
 
+<<<<<<< HEAD
+=======
+// Render new user page
+app.get('/newUser', function(req, res){
+ res.render('newUser');
+});
+
+// Enter global chat
+app.get('/blackjack', function(req, res){
+  res.render('blackjack');
+
+userName = req.cookies['username'];
+console.log("UserName", userName);
+});
+
+
+// ---------------------LISTENERS
+var userHash = {};
+  io.on('connection', function(socket){
+  socket.nickname = userName;    
+
+joinGame = function() {
+console.log("---------------------------");
+console.log("         New Round         ");
+console.log("---------------------------");
+// console.log("328 People in the RP : ", roomPlayer);
+// console.log("329 People in the queue : ", queue);
+
+  if ((socket.nickname) || (roomPlayer.length > 0 && queue.length > 0)){
+
+    if (!playerIntheRP()) {
+      roomPlayer.unshift(socket.nickname);
+      console.log("User name", socket.nickname);
+    }
+    if (g !== null) {
+
+        if (gameInProcess === true) {
+          console.log("342 gameInProcess-------------- ", gameInProcess);
+          queue.push(new Player(socket.nickname, "Joined next hand"));
+          io.emit('player joined next hand', queue[queue.length-1].name);
+
+ // Send message to the player --> "Joined the next hand" ---------------(Display on Player Side)
+
+        } else{
+          for (var i = 0; i < queue.length; i++) {
+            // console.log("350 Splice is about to be called: ", queue[i]);
+            g.playersArray.splice(-1,0,(queue[i]));
+          }
+          g.reset();
+          g.checkForCurrentPlayers();
+          if (g !== null) {
+            g.setUpRound();
+          }
+          
+        }
+    } else {
+      startGame(roomPlayer);
+
+      //tester------------------tester
+      for (var j = 0; j < g.playersArray.length ; j++) {
+        console.log("363 Player Name: "+ g.playersArray[j].name);
+      }
+      //tester------------------tester ends
+      g.setUpRound();
+    }
+  }
+};
+
+
+var playerIntheRP = function(){
+  for (var i = 0; i < roomPlayer.length; i++) {
+      if (roomPlayer[i] === socket.nickname) {
+        console.log("369 socket.nickname in playerIntheRP: ",socket.nickname);
+        return true;
+      }
+  }
+  return false;
+};
+
+
+
+>>>>>>> ccf311836c55a740ab24073c85993548e77a9171
     socket.on("join game", function(){
     console.log("Its connecting");
     joinGame();
     });
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> ccf311836c55a740ab24073c85993548e77a9171
     // console.log(userName)
     userHash[socket.nickname] = socket;
     // console.log(userHash["nick"])
@@ -763,8 +846,13 @@ Game.prototype.reset = function(){
     
 
     socket.on("disconnect", function(){
+<<<<<<< HEAD
 	console.log(userName);
       console.log("Retirado",socket.nickname);
+=======
+      console.log("Retirado",userName);
+      console.log("Retirado socket",socket.nickname);
+>>>>>>> ccf311836c55a740ab24073c85993548e77a9171
       if (g !== null) {
         for (var i = 0; i < g.playersArray.length -1; i++) {
           if (g.playersArray[i].name === socket.nickname) {
