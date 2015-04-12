@@ -191,8 +191,8 @@ Game.prototype.checkForWinner = function(index) {
   var dealer = this.playersArray[this.playersArray.length-1]; 
   var player = this.playersArray[index];
     // console.log(player.name + " Hand : " + player.hand);
-    console.log("Dealer Hand : " + dealer.hand);
-    console.log("Dealer Total: " , dealer.totalValue);
+    // console.log("Dealer Hand : " + dealer.hand);
+    // console.log("Dealer Total: " , dealer.totalValue);
     // Player busted
     if (player.totalValue > 21) {
         player.bet = 0;
@@ -364,6 +364,7 @@ console.log("---------------------------");
 
     if (!playerIntheRP()) {
       roomPlayer.unshift(userName);
+      console.log("User name", userName);
     }
     if (g !== null) {
 
@@ -410,11 +411,20 @@ var playerIntheRP = function(){
 };
 
 Game.prototype.checkForCurrentPlayers = function (){
+  var tmpName = "";
   for (var i = 0; i < this.playersArray.length -1; i++) {
     if (this.playersArray[i].logged === "No") {
       this.playersArray.splice(i, 1); 
+      tmpName = this.playersArray[i].name;
     } 
   }
+  // for (var j = 0; j < roomPlayer.length -1; j++) {
+  //   if (roomPlayer[i] === tmpName) {
+  //     console.log("VaR TEMP", tmpName);
+  //     roomPlayer.splice(i,1);
+  //   } 
+  // }
+
   if (this.playersArray.length-1 === 0) {
     console.log("Sole el delaer, se acaba el juego");
     g = null;
@@ -427,6 +437,11 @@ Game.prototype.checkForCurrentPlayers = function (){
 // ------------------- PLAY ROUND  -------------------------------
 
 Game.prototype.setUpRound = function(){
+
+  for (var j = 0; j < roomPlayer.length; j++) {
+      console.log("RP:::::: ",roomPlayer[j]);  
+    }
+
 
   gameInProcess = true;
   g.initialDeal();
@@ -443,13 +458,16 @@ Game.prototype.setUpRound = function(){
 
 
   //tester------------------tester
-    console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
-    console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
+    // console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
+    // console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
 
   // Next line shows all the players on the table
     io.emit ('active players', this.playersArray);    
+
+    
+    
 
 };
 
@@ -510,8 +528,8 @@ Game.prototype.hit = function(){
 
   //tester------------------tester
   for (var i = 0; i < this.playersArray.length -1; i++) {
-    console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
-    console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
+    // console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
+    // console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
     userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
   }
   //tester------------------tester ends
@@ -669,9 +687,8 @@ var userHash = {};
     });
     socket.nickname = userName;
     // console.log(userName)
-    userHash[userName] = socket;
+    userHash[socket.nickname] = socket;
     // console.log(userHash["nick"])
-    userHash[userName].emit("hello world", "hello world " + userName );
     // --------TEST -----------------
     // io.emit("set time", count1 );
     // console.log("Timer Camilo", timeTest());
@@ -684,8 +701,7 @@ var userHash = {};
     });
 
     socket.on("leave the table", function(){
-      
-      g.logOut(userName);
+      g.logOut(socket.nickname);
 
     });
     // bet logic goes here:
@@ -700,38 +716,23 @@ var userHash = {};
 
     socket.on("disconnect", function(){
       
-      console.log("Retirado",userName);
+      console.log("Retirado",socket.nickname);
       if (g !== null) {
         for (var i = 0; i < g.playersArray.length -1; i++) {
-          if (g.playersArray[i].name === userName) {
+          if (g.playersArray[i].name === socket.nickname) {
             g.playersArray[i].logged = "No";
             console.log(g.playersArray[i].name);
           }
           
         }
       }    
-
-
-      // function matchesName(array, nameToCheck) {
-      //   // console.log("CAMILO HERE HERE",array);
-      //   // console.log("EL otro ", nameToCheck);
-      //   console.log("EL otro 2", userName);
-        
-      //   for (var i=0; i > array.length; i++){
-      //     if (array[i].name === userName){
-      //         g.playersArray[i].status = "retired"; 
-      //         console.log("Retirado" , g.playersArray[i].status);
-      //       // return i;
-      //     }
-      //   }
-
-      // }
-      // //Camilo test
-      // if (g !== null) {
-      //   console.log("Probando ", matchesName);
-      //  g.playersArray.splice(matchesName(g.playersArray), 1); 
-      // }
-      // g.playersArray.splice(matchesName(g.playersArray), 1);
+    
+      for (var j = 0; j < roomPlayer.length; j++) {
+          if (roomPlayer[j] === socket.nickname) {
+            roomPlayer.splice(j,1);
+          }
+          
+        }
     });
 });
 

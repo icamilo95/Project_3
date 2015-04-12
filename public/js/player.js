@@ -34,7 +34,7 @@ $('#leaveTableButton').toggle();
   });
 
   $('#leaveTable').on("submit", function(e){
-    socket.emit('leave the table');
+    socket.emit('disconnect');
   });  
 
 
