@@ -17,6 +17,65 @@ app.use(express.static(__dirname + "/public"));
 app.use(cookieParser());
 
 // -------------------CARD CLASS --------------------------
+
+// Render new user page
+app.get('/newUser', function(req, res){
+ res.render('newUser');
+});
+
+// Enter global chat
+app.get('/blackjack', function(req, res){
+  res.render('blackjack');
+
+userName = req.cookies['username'];
+console.log("UserName", userName);
+});
+
+
+// ---------------------SHOWS INDEX PAGE
+app.get('/', function(req, res){
+  res.render('index');
+});
+
+// ---------------------POST ROUTE FOR CREATING A NEW USER
+// Create new User
+ //validate uniqueness of userName
+ app.post("/newuser", function(req, res){
+   client.HSETNX("users", req.body.userName, req.body.userPass, function(err, success) {
+     if (success === 1) {
+       res.redirect('/');
+     } else {
+       console.log("person already exists, figure out how to render this to the page");
+     }
+   });
+ });
+
+
+// ---------------------VALIDATES THE RIGHT USER NAME AND PASSWORND AND REDIRECTS TO GAME 
+//validates userPass === userName and logs in
+ app.post("/blackjack", function(req, res){
+  var getUserPass = function(){
+    client.HGET("users", req.body.userName, function(err, reply){
+      if (err){
+        console.log("Could not query the database");
+      }
+      if (req.body.userPass == reply){
+        res.redirect("/blackjack");
+      } else {
+        console.log("Incorrect UserName or Password");
+        res.redirect('/');
+      }
+    });
+  };
+  getUserPass();
+});
+
+
+
+var userHash = {};
+  io.on('connection', function(socket){
+    socket.nickname = userName;
+
 var Card = function (suit, rank) {
   this.suit = suit;
   this.rank = rank;
@@ -360,17 +419,16 @@ console.log("---------------------------");
 // console.log("328 People in the RP : ", roomPlayer);
 // console.log("329 People in the queue : ", queue);
 
-  if ((userName) || (roomPlayer.length > 0 && queue.length > 0)){
-
+  if ((socket.nickname) || (roomPlayer.length > 0 && queue.length > 0)){
     if (!playerIntheRP()) {
-      roomPlayer.unshift(userName);
-      console.log("User name", userName);
+      roomPlayer.unshift(socket.nickname);
+      console.log("User name", socket.nickname);
     }
     if (g !== null) {
 
         if (gameInProcess === true) {
           console.log("342 gameInProcess-------------- ", gameInProcess);
-          queue.push(new Player(userName, "Joined next hand"));
+          queue.push(new Player(socket.nickname, "Joined next hand"));
           io.emit('player joined next hand', queue[queue.length-1].name);
 
  // Send message to the player --> "Joined the next hand" ---------------(Display on Player Side)
@@ -402,8 +460,8 @@ console.log("---------------------------");
 
 var playerIntheRP = function(){
   for (var i = 0; i < roomPlayer.length; i++) {
-      if (roomPlayer[i] === userName) {
-        console.log("369 UserName in playerIntheRP: ",userName);
+      if (roomPlayer[i] === socket.nickname) {
+        console.log("369 UserName in playerIntheRP: ",socket.nickname);
         return true;
       }
   }
@@ -664,28 +722,11 @@ Game.prototype.reset = function(){
  // ROUTES AND OTHER THINGS BELOW:
 
 
-// Render new user page
-app.get('/newUser', function(req, res){
- res.render('newUser');
-});
-
-// Enter global chat
-app.get('/blackjack', function(req, res){
-  res.render('blackjack');
-
-userName = req.cookies['username'];
-console.log("UserName", userName);
-});
-
-
-// ---------------------LISTENERS
-var userHash = {};
-  io.on('connection', function(socket){
     socket.on("join game", function(){
     console.log("Its connecting");
     joinGame();
     });
-    socket.nickname = userName;
+
     // console.log(userName)
     userHash[socket.nickname] = socket;
     // console.log(userHash["nick"])
@@ -712,10 +753,17 @@ var userHash = {};
       console.log(g.playersArray[g.turn].bet);
       console.log('-------------------');
     });
+
+
+
+
+
+
+// ---------------------LISTENERS
     
 
     socket.on("disconnect", function(){
-      
+	console.log(userName);
       console.log("Retirado",socket.nickname);
       if (g !== null) {
         for (var i = 0; i < g.playersArray.length -1; i++) {
@@ -734,46 +782,8 @@ var userHash = {};
           
         }
     });
-});
 
-// ---------------------SHOWS INDEX PAGE
-app.get('/', function(req, res){
-  res.render('index');
-});
-
-// ---------------------POST ROUTE FOR CREATING A NEW USER
-// Create new User
- //validate uniqueness of userName
- app.post("/newuser", function(req, res){
-   client.HSETNX("users", req.body.userName, req.body.userPass, function(err, success) {
-     if (success === 1) {
-       res.redirect('/');
-     } else {
-       console.log("person already exists, figure out how to render this to the page");
-     }
-   });
- });
-
-
-// ---------------------VALIDATES THE RIGHT USER NAME AND PASSWORND AND REDIRECTS TO GAME 
-//validates userPass === userName and logs in
- app.post("/blackjack", function(req, res){
-  var getUserPass = function(){
-    client.HGET("users", req.body.userName, function(err, reply){
-      if (err){
-        console.log("Could not query the database");
-      }
-      if (req.body.userPass == reply){
-        res.redirect("/blackjack");
-      } else {
-        console.log("Incorrect UserName or Password");
-        res.redirect('/');
-      }
-    });
-  };
-  getUserPass();
-});
-
+  });
 
 
 // ---------------------START THE SERVER --------------------
