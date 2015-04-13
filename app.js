@@ -2,8 +2,12 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var redis = require("redis");
-var client = redis.createClient();
+var redis = require('redis');
+var url = require('url');
+var redisURL = url.parse(process.env.REDISCLOUD_URL);
+var client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
+client.auth(redisURL.auth.split(":")[1]);
+
 var methodOverride = require("method-override");
 var bodyParser = require("body-parser");
 var cookieParser = require('cookie-parser');
@@ -18,44 +22,44 @@ app.use(cookieParser());
 
 // -------------------CARD CLASS --------------------------
 var Card = function (suit, rank) {
-  this.suit = suit;
-  this.rank = rank;
-  if (this.rank >= 10) {
-    this.value = 10;
-  }
+    this.suit = suit;
+    this.rank = rank;
+    if (this.rank >= 10) {
+	this.value = 10;
+    }
 
-  else(this.value = this.rank);
+    else(this.value = this.rank);
 
 };
 
 Card.SUITS = [
-  Card.CLUBS    = 'clubs',
-  Card.DIAMONDS = 'diamonds',
-  Card.HEARTS   = 'hearts',
-  Card.SPADES   = 'spades'
+    Card.CLUBS    = 'clubs',
+    Card.DIAMONDS = 'diamonds',
+    Card.HEARTS   = 'hearts',
+    Card.SPADES   = 'spades'
 ];
 
 Card.prototype = {
-  get face_card() {
-    return this.rank > 10;
-  },
-  valueOf: function() {
-    return this.rank;
-  },
-  toString: function() {
-    var rank = {1: 'ace', 11: 'jack', 12: 'queen', 13: 'king'}[this.rank] || this.rank;
-    return rank + ' of ' + this.suit;
-  }
+    get face_card() {
+	return this.rank > 10;
+    },
+    valueOf: function() {
+	return this.rank;
+    },
+    toString: function() {
+	var rank = {1: 'ace', 11: 'jack', 12: 'queen', 13: 'king'}[this.rank] || this.rank;
+	return rank + ' of ' + this.suit;
+    }
 };
 
 var Deck = function() {
-  this.cards = [];
-  for (var i = 0; i < Card.SUITS.length; i++) {   
-    for (var rank = 1; rank <= 13; rank++) {
-      this.cards.push(new Card(Card.SUITS[i], rank));
+    this.cards = [];
+    for (var i = 0; i < Card.SUITS.length; i++) {
+	for (var rank = 1; rank <= 13; rank++) {
+	    this.cards.push(new Card(Card.SUITS[i], rank));
+	}
     }
-  }
-  this.shuffle();
+    this.shuffle();
 };
 
 
@@ -63,15 +67,15 @@ var Deck = function() {
 
 
 Deck.prototype = {
-  count: function() {
-    return this.cards.length;
-  },
-  draw: function(n) {
-    return this.cards.splice(-n, n);
-  },
-  shuffle: function() {
-    this.cards.sort(function() { return Math.random() - 0.5; });  
-  },
+    count: function() {
+	return this.cards.length;
+    },
+    draw: function(n) {
+	return this.cards.splice(-n, n);
+    },
+    shuffle: function() {
+	this.cards.sort(function() { return Math.random() - 0.5; });
+    },
 };
 
 
@@ -88,65 +92,65 @@ var Player = function(name, status){
     this.logged = "Yes";
 };
 
- Player.prototype.totalhand = function(){ 
-  this.totalValue = 0;
-  // i need to make a new array to sort the cards in 
-  var sortedArr = [];
-  //make that new array equal to the hand array
-  // by pushing every element into the sortedArr
-  for (var i=0;i<this.hand.length;i++) {
-    sortedArr.push(this.hand[i]);
-  }
-  //sort that new array(sortedArr) by the value of each card instance
-  sortedArr.sort(function (a, b) {
-    if (a.valueOf() > b.valueOf()) {
-      return 1;
+Player.prototype.totalhand = function(){
+    this.totalValue = 0;
+    // i need to make a new array to sort the cards in
+    var sortedArr = [];
+    //make that new array equal to the hand array
+    // by pushing every element into the sortedArr
+    for (var i=0;i<this.hand.length;i++) {
+	sortedArr.push(this.hand[i]);
     }
-    if (a.valueOf() < b.valueOf()) {
-      return -1;
+    //sort that new array(sortedArr) by the value of each card instance
+    sortedArr.sort(function (a, b) {
+	if (a.valueOf() > b.valueOf()) {
+	    return 1;
+	}
+	if (a.valueOf() < b.valueOf()) {
+	    return -1;
+	}
+	return 0;
+    });
+    //check to see if the first card is an ace (really, if there is an ace in the array)
+    // make sure to check that this function hasn't been called before for this player
+
+    if (sortedArr[0].valueOf() === 1 && this.aceCounter === 0) {
+
+	//if it is, loop through the rest of the values and add them up.
+	// set that equal to a newTotal;
+	var newTotal = 0;
+
+	for (var a=1;a<sortedArr.length; a++){
+
+	    newTotal += sortedArr[a].valueOf();
+	    // console.log("newTotal",newTotal);
+	}
+
+	// if the sum of the other values is less than 10, we want the ace
+	// equal to 11, not 1. so add 10 to the totalvalue
+	if (newTotal < 10){
+	    this.totalValue += 10;
+	    this.aceCounter += 1;
+	}
     }
-    return 0;
-  });
-  //check to see if the first card is an ace (really, if there is an ace in the array)
-  // make sure to check that this function hasn't been called before for this player
 
-  if (sortedArr[0].valueOf() === 1 && this.aceCounter === 0) {
-
-    //if it is, loop through the rest of the values and add them up.
-    // set that equal to a newTotal;
-    var newTotal = 0;
-
-    for (var a=1;a<sortedArr.length; a++){
-
-      newTotal += sortedArr[a].valueOf();
-      // console.log("newTotal",newTotal);
+    if (sortedArr.length === 2 &&
+	((sortedArr[0].valueOf() === 1 && sortedArr[1].valueOf() >= 10)||
+	 (sortedArr[1].valueOf() === 1 && sortedArr[0].valueOf() >= 10)) && this.aceCounter === 0) {
+	this.totalValue += 10;
+	this.aceCounter += 1;
     }
 
-    // if the sum of the other values is less than 10, we want the ace
-    // equal to 11, not 1. so add 10 to the totalvalue
-    if (newTotal < 10){
-      this.totalValue += 10;
-      this.aceCounter += 1;
+    if (sortedArr.length === 2 &&
+	((sortedArr[0].valueOf() === 1 && sortedArr[1].valueOf() >= 10) || (sortedArr[1].valueOf() === 1 && sortedArr[0].valueOf() >= 10)) && this.aceCounter === 0) {
+	this.totalValue += 10;
+	this.aceCounter += 1;
     }
-  }
 
-   if (sortedArr.length === 2 &&
-((sortedArr[0].valueOf() === 1 && sortedArr[1].valueOf() >= 10)||
-(sortedArr[1].valueOf() === 1 && sortedArr[0].valueOf() >= 10)) && this.aceCounter === 0) {
-      this.totalValue += 10;
-      this.aceCounter += 1;
-   }
-
-  if (sortedArr.length === 2 &&
-    ((sortedArr[0].valueOf() === 1 && sortedArr[1].valueOf() >= 10) || (sortedArr[1].valueOf() === 1 && sortedArr[0].valueOf() >= 10)) && this.aceCounter === 0) {
-    this.totalValue += 10;
-    this.aceCounter += 1;
-}
-
-  // console.log("this.totalValue",this.totalValue);
-  // take all the cards, and add them up.
+    // console.log("this.totalValue",this.totalValue);
+    // take all the cards, and add them up.
     for(var j=0;j<this.hand.length;j++){
-      this.totalValue += this.hand[j].value;
+	this.totalValue += this.hand[j].value;
     }
     // console.log("Total Value " + this.totalValue);
     return this.totalValue;
@@ -159,12 +163,12 @@ var Player = function(name, status){
 
 var Game = function(players) {
     this.playersArray = [];
-//     this.currentTurn =
-// push a player into the playersArray for each player in the
-// array that is passed in when you create a new game
+    //     this.currentTurn =
+    // push a player into the playersArray for each player in the
+    // array that is passed in when you create a new game
     for (var i=0;i<players.length;i++){
-        this.playersArray.push(new Player(players[i]));
-      }
+	this.playersArray.push(new Player(players[i]));
+    }
     this.playersArray.push(new Player("Dealer"));
     this.currentDeck = new Deck();
     this.turn = 0;
@@ -177,110 +181,110 @@ Game.prototype.deal = function(index, cards){
     this.playersArray[index].totalhand();
 
     if(this.playersArray.length -2 >= this.turn ){
-      userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
+	userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
     }
 };
- 
+
 
 // -------------------CHECK FOR WINNER -----------------
 
 Game.prototype.checkForWinner = function(index) {
-  var win = "";
-  this.dealerStatus();
-  // Instance of the Dealer
-  var dealer = this.playersArray[this.playersArray.length-1]; 
-  var player = this.playersArray[index];
+    var win = "";
+    this.dealerStatus();
+    // Instance of the Dealer
+    var dealer = this.playersArray[this.playersArray.length-1];
+    var player = this.playersArray[index];
     // console.log(player.name + " Hand : " + player.hand);
     // console.log("Dealer Hand : " + dealer.hand);
     // console.log("Dealer Total: " , dealer.totalValue);
     // Player busted
     if (player.totalValue > 21) {
-        player.bet = 0;
-        player.status = player.name + " Busted";
-        console.log("-------------------------------");
-        console.log(player.name + " Busted");
-        console.log("-------------------------------");
-    // Dealer Wins with BlackJack
+	player.bet = 0;
+	player.status = player.name + " Busted";
+	console.log("-------------------------------");
+	console.log(player.name + " Busted");
+	console.log("-------------------------------");
+	// Dealer Wins with BlackJack
     } else if (dealer.blackjack() && !(player.blackjack())) {
-      player.bet = 0;
-      player.status = " Dealer wins with BLACKJACK ";
-      console.log("-------------------------------");
-      console.log("Dealer wins with BLACKJACK");
-      console.log("-------------------------------");
-    // Player Win
+	player.bet = 0;
+	player.status = " Dealer wins with BLACKJACK ";
+	console.log("-------------------------------");
+	console.log("Dealer wins with BLACKJACK");
+	console.log("-------------------------------");
+	// Player Win
     } else if (player.totalValue > dealer.totalValue){
-        if (player.blackjack()) {
+	if (player.blackjack()) {
 
-          player.money += (player.bet * 2.5);  
-          player.status = player.name + " wins with BLACKJACK";
+	    player.money += (player.bet * 2.5);
+	    player.status = player.name + " wins with BLACKJACK";
 
-          console.log("-------------------------------");
-          console.log(player.name + " wins with BLACKJACK ");
-          console.log("-------------------------------");
-        } else {
+	    console.log("-------------------------------");
+	    console.log(player.name + " wins with BLACKJACK ");
+	    console.log("-------------------------------");
+	} else {
 
-          player.money += (player.bet * 2);  
-          player.status = player.name + " wins ";
+	    player.money += (player.bet * 2);
+	    player.status = player.name + " wins ";
 
-          console.log("-------------------------------");
-          console.log(player.name + " wins");
-          console.log("-------------------------------");
-        } 
-        player.bet = 0;
-    // Dealer Busted - Player Win
+	    console.log("-------------------------------");
+	    console.log(player.name + " wins");
+	    console.log("-------------------------------");
+	}
+	player.bet = 0;
+	// Dealer Busted - Player Win
 
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue > 21)) {
-      player.money += (player.bet * 2);
-      player.bet = 0;  
-      player.status = player.name +" wins - Dealer Busted ";
+	player.money += (player.bet * 2);
+	player.bet = 0;
+	player.status = player.name +" wins - Dealer Busted ";
 
-      console.log("-------------------------------");
-      console.log(player.name +" wins - Dealer Busted");
-      console.log("-------------------------------");
-    // Dealer Win
+	console.log("-------------------------------");
+	console.log(player.name +" wins - Dealer Busted");
+	console.log("-------------------------------");
+	// Dealer Win
     } else if ((player.totalValue < dealer.totalValue) && (dealer.totalValue < 22)){
-      player.bet = 0;
-      player.status = "Dealer Wins ";
-      console.log("-------------------------------");
-      console.log("Dealer Wins ");
-      console.log("-------------------------------");
-    // Tie Game
+	player.bet = 0;
+	player.status = "Dealer Wins ";
+	console.log("-------------------------------");
+	console.log("Dealer Wins ");
+	console.log("-------------------------------");
+	// Tie Game
     } else if (player.totalValue === dealer.totalValue) {
-      if (player.blackjack() && !dealer.blackjack()) {
+	if (player.blackjack() && !dealer.blackjack()) {
 
-        player.money += (player.bet * 2.5);  
-        player.status = player.name +" wins with BJ and Dealer only 21 ";
+	    player.money += (player.bet * 2.5);
+	    player.status = player.name +" wins with BJ and Dealer only 21 ";
 
-        console.log("-------------------------------");
-        console.log( player.name +" wins with BJ and Dealer only 21");    
-        console.log("-------------------------------");
-      }
-      player.totalValue += player.bet;
-      player.bet = 0;
-      player.status = "Tie Game";
-      console.log("-------------------------------");
-      console.log("Tie Game");
-      console.log("-------------------------------");
+	    console.log("-------------------------------");
+	    console.log( player.name +" wins with BJ and Dealer only 21");
+	    console.log("-------------------------------");
+	}
+	player.totalValue += player.bet;
+	player.bet = 0;
+	player.status = "Tie Game";
+	console.log("-------------------------------");
+	console.log("Tie Game");
+	console.log("-------------------------------");
     }
 
 
     //-------------Displays the money, dealers cards and Winner for every player
-  for (var i = 0; i < this.playersArray.length -1; i++) {
-    userHash[this.playersArray[i].name].emit('wallet',this.playersArray[i].money);  
-    userHash[this.playersArray[i].name].emit("rest of dealers cards", this.playersArray[this.playersArray.length -1].hand);
-    userHash[this.playersArray[i].name].emit('winner',this.playersArray[i].status);  
-  }
+    for (var i = 0; i < this.playersArray.length -1; i++) {
+	userHash[this.playersArray[i].name].emit('wallet',this.playersArray[i].money);
+	userHash[this.playersArray[i].name].emit("rest of dealers cards", this.playersArray[this.playersArray.length -1].hand);
+	userHash[this.playersArray[i].name].emit('winner',this.playersArray[i].status);
+    }
 
 };
 
 //-------------- DELAER STATUS -----------------------
 
 Game.prototype.dealerStatus = function(){
-  while (this.dealerUnder17()){
-    if (!this.playersArray[this.playersArray.length -1].blackjack()){
-      this.deal(this.playersArray.length-1,1); // Check for hit 
+    while (this.dealerUnder17()){
+	if (!this.playersArray[this.playersArray.length -1].blackjack()){
+	    this.deal(this.playersArray.length-1,1); // Check for hit
+	}
     }
-  }
 };
 
 
@@ -289,43 +293,43 @@ Game.prototype.dealerStatus = function(){
 
 
 Player.prototype.busted = function(){
-  var hand = this.totalhand();
-  return hand > 21;
+    var hand = this.totalhand();
+    return hand > 21;
 };
 
 Player.prototype.blackjack = function(){
-  return (this.hand[0].face_card && this.hand[1].rank === 1) || (this.hand[1].face_card && this.hand[0].rank === 1);
+    return (this.hand[0].face_card && this.hand[1].rank === 1) || (this.hand[1].face_card && this.hand[0].rank === 1);
 };
 
 Player.prototype._21 = function() {
- return this.totalhand() === 21 && !this.blackjack();
+    return this.totalhand() === 21 && !this.blackjack();
 };
 
 Player.prototype.under21 = function() {
-  return this.totalhand() < 21;
+    return this.totalhand() < 21;
 };
 
 Game.prototype.dealerUnder17 =  function() {
-  return this.playersArray[this.playersArray.length -1].totalValue < 17;
+    return this.playersArray[this.playersArray.length -1].totalValue < 17;
 };
 
 Game.prototype.dealerOver16 =  function() {
-  var players = this.playersArray;
-  var dealer = players[players.length -1];
-  var x = dealer.totalValue;
-  return ((21 > x) && (x > 16)); 
+    var players = this.playersArray;
+    var dealer = players[players.length -1];
+    var x = dealer.totalValue;
+    return ((21 > x) && (x > 16));
 };
 
 //-------------- SUPPORTIVE FUNCTIONS FOR THE GAME------------------
 
 Game.prototype.initialDeal = function() {
-  _this = this;
-  this.playersArray.forEach(function(el, index){
-     _this.deal(index,2);
-  });
+    _this = this;
+    this.playersArray.forEach(function(el, index){
+	_this.deal(index,2);
+    });
 
-  if(this.playersArray.length -2 >= this.turn ){
-      userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
+    if(this.playersArray.length -2 >= this.turn ){
+	userHash[this.playersArray[this.turn].name].emit("cards", this.playersArray[this.turn].hand);
     }
 
 };
@@ -334,11 +338,11 @@ Game.prototype.initialDeal = function() {
 // -------------------TEST DECK  ------------------------------
 var newArr = [];
 Game.prototype.clearDeck = function(){
-  for (var i=0; i<this.currentDeck.cards.length;i++){
-    if ( 9 < this.currentDeck.cards[i].rank || this.currentDeck.cards[i].rank === 1){
-    newArr.push(this.currentDeck.cards[i]);
+    for (var i=0; i<this.currentDeck.cards.length;i++){
+	if ( 9 < this.currentDeck.cards[i].rank || this.currentDeck.cards[i].rank === 1){
+	    newArr.push(this.currentDeck.cards[i]);
+	}
     }
-  }
 };
 
 
@@ -348,8 +352,8 @@ var roomPlayer = [], gameInProcess = false, queue = [], g = null, count2 = 0;
 
 // -------------------START GAME  ------------------------------
 var startGame = function(array){
-  g = new Game(array);
-  return g;
+    g = new Game(array);
+    return g;
 };
 
 
@@ -357,26 +361,26 @@ var startGame = function(array){
 
 
 Game.prototype.checkForCurrentPlayers = function (){
-  var tmpName = "";
-  for (var i = 0; i < this.playersArray.length -1; i++) {
-    if (this.playersArray[i].logged === "No") {
-      this.playersArray.splice(i, 1); 
-      tmpName = this.playersArray[i].name;
-    } 
-  }
-  // for (var j = 0; j < roomPlayer.length -1; j++) {
-  //   if (roomPlayer[i] === tmpName) {
-  //     console.log("VaR TEMP", tmpName);
-  //     roomPlayer.splice(i,1);
-  //   } 
-  // }
+    var tmpName = "";
+    for (var i = 0; i < this.playersArray.length -1; i++) {
+	if (this.playersArray[i].logged === "No") {
+	    this.playersArray.splice(i, 1);
+	    // tmpName = this.playersArray[i].name;
+	}
+    }
+    // for (var j = 0; j < roomPlayer.length -1; j++) {
+    //   if (roomPlayer[i] === tmpName) {
+    //     console.log("VaR TEMP", tmpName);
+    //     roomPlayer.splice(i,1);
+    //   }
+    // }
 
-  if (this.playersArray.length-1 === 0) {
-    console.log("Sole el delaer, se acaba el juego");
-    g = null;
-    this.playersArray = [];
-  }
-  console.log(" 415 Players for the next Round " + this.playersArray);
+    if (this.playersArray.length-1 === 0) {
+	console.log("Sole el delaer, se acaba el juego");
+	g = null;
+	this.playersArray = [];
+    }
+    console.log(" 415 Players for the next Round " + this.playersArray);
 };
 
 
@@ -384,44 +388,44 @@ Game.prototype.checkForCurrentPlayers = function (){
 
 Game.prototype.setUpRound = function(){
 
-  for (var j = 0; j < roomPlayer.length; j++) {
-      console.log("RP:::::: ",roomPlayer[j]);  
+    for (var j = 0; j < roomPlayer.length; j++) {
+	console.log("RP:::::: ",roomPlayer[j]);
     }
 
 
-  gameInProcess = true;
-  g.initialDeal();
-  this.turn = 0;
-  this.playRound();
-  for (var i = 0; i < this.playersArray.length ; i++) {
-    // It displays cards for all players but the Dealer
-    if (this.playersArray[i].name !== "Dealer") {
-      userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
-      userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
-    // It displays de first Dealer's card
-      userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
+    gameInProcess = true;
+    g.initialDeal();
+    this.turn = 0;
+    this.playRound();
+    for (var i = 0; i < this.playersArray.length ; i++) {
+	// It displays cards for all players but the Dealer
+	if (this.playersArray[i].name !== "Dealer") {
+	    userHash[this.playersArray[i].name].emit("cards", this.playersArray[i].hand);
+	    userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
+	    // It displays de first Dealer's card
+	    userHash[this.playersArray[i].name].emit("card_1_Dealer", this.playersArray[this.playersArray.length -1].hand);
+	}
+
+
+	//tester------------------tester
+	// console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
+	// console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
     }
+    //tester------------------tester ends
+
+    // Next line shows all the players on the table
+    io.emit ('active players', this.playersArray);
 
 
-  //tester------------------tester
-    // console.log("427 Player "+ this.playersArray[i].name + " HAND:  "+ this.playersArray[i].hand);
-    // console.log("429 Player "+ this.playersArray[i].name + " TOTAL:------------------------------ "+ this.playersArray[i].totalValue);
-  }
-  //tester------------------tester ends
 
-  // Next line shows all the players on the table
-    io.emit ('active players', this.playersArray);    
-
-    
-    
 
 };
 
 Game.prototype.playRound = function(){
 
-  this.playersArray[this.turn].money -= this.playersArray[this.turn].bet;
-  this.playersArray[this.turn].status = "Your turn";
-  this.playTimer();
+    this.playersArray[this.turn].money -= this.playersArray[this.turn].bet;
+    this.playersArray[this.turn].status = "Your turn";
+    this.playTimer();
 };
 
 Game.prototype.displayButtonsToPlayer = function() {
@@ -429,95 +433,96 @@ Game.prototype.displayButtonsToPlayer = function() {
 };
 
 Game.prototype.hidePlayerHsButtons = function() {
-  // if  (this.playersArray.length -2 >= this.turn){
-  if (this.playersArray[this.turn].name !== "Dealer") {
-    userHash[this.playersArray[this.turn].name].emit('hide',"HI!!!!!");
-  }
-}; 
+    // if  (this.playersArray.length -2 >= this.turn){
+    if (this.playersArray[this.turn].name !== "Dealer") {
+	userHash[this.playersArray[this.turn].name].emit('hide',"HI!!!!!");
+    }
+};
 
 
 
 Game.prototype.playTimer = function(){
-// Dislpays player's turn
-  io.emit('turn',this.playersArray[this.turn].name);
-  this.displayButtonsToPlayer();
-  count1 = 20; // Required dont delete
-  //Sets screen timer
-  this.intervalTrigger();
-  var _this = this;
-  //Sets internal timer for players turn
-  this.timerPlay = setTimeout(function(){
-    _this.playersArray[_this.turn].status = "Stand";
-    _this.stand();
-  _this.cleanTimer =  clearInterval(_this.intervalId);
-  },21000);
+    // Dislpays player's turn
+    io.emit('turn',this.playersArray[this.turn].name);
+    this.displayButtonsToPlayer();
+    count1 = 20; // Required dont delete
+    //Sets screen timer
+    this.intervalTrigger();
+    var _this = this;
+    //Sets internal timer for players turn
+    this.timerPlay = setTimeout(function(){
+	_this.playersArray[_this.turn].status = "Stand";
+	_this.stand();
+	_this.cleanTimer =  clearInterval(_this.intervalId);
+    },21000);
 
 };
 
 Game.prototype.intervalTrigger = function(){
-  var _this = this;
-  this.intervalId = setInterval(function() {
-    _this.callCounter();
-  },1000);
+    var _this = this;
+    this.intervalId = setInterval(function() {
+	_this.callCounter();
+    },1000);
 };
 
 Game.prototype.callCounter = function(){
-  console.log(count1);
-  count1 -= 1;
-  io.emit("set time", count1 );
+    console.log(count1);
+    count1 -= 1;
+    io.emit("set time", count1 );
 };
 
 
 Game.prototype.hit = function(){
-  this.deal(this.turn, 1);
+    this.deal(this.turn, 1);
 
 
-  //tester------------------tester
-  for (var i = 0; i < this.playersArray.length -1; i++) {
-    // console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
-    // console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
-    userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
-  }
-  //tester------------------tester ends
+    //tester------------------tester
+    for (var i = 0; i < this.playersArray.length -1; i++) {
+	// console.log("490 Player "+ this.playersArray[i].name  +" HAND:  "+ this.playersArray[i].hand);
+	// console.log("491 Player "+ this.playersArray[i].name  +" TOTAL--------------------------------:  "+ this.playersArray[i].totalValue);
+	userHash[this.playersArray[i].name].emit("total hand", this.playersArray[i].totalValue);
+    }
+    //tester------------------tester ends
 
-  if (this.playersArray[this.turn].busted()) {
-    this.playersArray[this.turn].status = "Busted";
-    clearTimeout(this.timerPlay);
-    clearInterval(this.intervalId);
-    this.stand();
-  }else {
-    clearTimeout(this.timerPlay);
-    clearInterval(this.intervalId);
-    this.playTimer();
-  }
+    if (this.playersArray[this.turn].busted()) {
+	this.playersArray[this.turn].status = "Busted";
+	clearTimeout(this.timerPlay);
+	clearInterval(this.intervalId);
+	this.stand();
+    }else {
+	clearTimeout(this.timerPlay);
+	clearInterval(this.intervalId);
+	this.playTimer();
+    }
 };
 
 Game.prototype.stand = function(){
-clearTimeout(this.timerPlay);
-clearInterval(this.intervalId);
-this.hidePlayerHsButtons();
-if (this.playersArray[this.turn].status !== "Busted") {
-  this.playersArray[this.turn].status = "Stand";
-}
+    clearTimeout(this.timerPlay);
+    clearInterval(this.intervalId);
+    this.hidePlayerHsButtons();
+    if (this.playersArray[this.turn].status !== "Busted") {
+	this.playersArray[this.turn].status = "Stand";
+    }
 
-this.nextTurn();
+    this.nextTurn();
 };
 
 Game.prototype.nextTurn = function(){
-  this.turn += 1;
-  if (this.playersArray.length-1 > this.turn) {
-    this.playRound();
-    console.log("501 Next Turn with many players");
-  } else {
-    for (var i = 0; i < this.playersArray.length-1; i++) {
-      this.checkForWinner(i);
+    this.turn += 1;
+    if (this.playersArray.length-1 > this.turn) {
+	this.playRound();
+	console.log("501 Next Turn with many players");
+    } else {
+	for (var i = 0; i < this.playersArray.length-1; i++) {
+	    this.checkForWinner(i);
+	}
+	this.finishHand();
     }
-  this.finishHand();
-  }
 };
 
 
 Game.prototype.finishHand = function() {
+<<<<<<< HEAD
   _this = this;
   count2 = 10;
   this.finishIntervalTrigger();
@@ -545,25 +550,27 @@ Game.prototype.finishHand = function() {
     }
 
   },10000);
+
 };
 
 
 Game.prototype.finishIntervalTrigger = function(){
-  var _this = this;
-  this.finishIntervalId = setInterval(function() {
-    _this.finishCallCounter();
-    io.emit('turn off join game');
-  },1000);
+    var _this = this;
+    this.finishIntervalId = setInterval(function() {
+	_this.finishCallCounter();
+	io.emit('turn off join game');
+    },1000);
 };
 
 Game.prototype.finishCallCounter = function(){
-  console.log(count1);
-  count2 -= 1;
-  io.emit("set finish time", count2 );
+    console.log(count1);
+    count2 -= 1;
+    io.emit("set finish time", count2 );
 };
 
 
 Game.prototype.invitePlayersForAnotherRound = function(){
+
   io.emit("play again on");
 };
 
@@ -583,6 +590,7 @@ Game.prototype.logOut = function (name) {
     g = null;
     clearTimeout(_this.finishTimer);
   }
+
 };
 
 
@@ -590,14 +598,14 @@ Game.prototype.logOut = function (name) {
 // ------------------- RESET GAME  ------------------------------
 
 Game.prototype.reset = function(){
-      for (var i = 0; i < this.playersArray.length; i++) {
-        this.playersArray[i].aceCounter = 0;
-        this.playersArray[i].hand = [];
-        this.playersArray[i].bet = 10;
-      }
-      this.currentDeck = new Deck();
-      queue = [];
-      // io.emit('delete previous cards',this.playersArray[this.turn].hand);
+    for (var i = 0; i < this.playersArray.length; i++) {
+	this.playersArray[i].aceCounter = 0;
+	this.playersArray[i].hand = [];
+	this.playersArray[i].bet = 10;
+    }
+    this.currentDeck = new Deck();
+    queue = [];
+    // io.emit('delete previous cards',this.playersArray[this.turn].hand);
 };
 
 
@@ -609,25 +617,26 @@ Game.prototype.reset = function(){
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
- // ROUTES AND OTHER THINGS BELOW:
+// ROUTES AND OTHER THINGS BELOW:
 
 
 // Render new user page
 app.get('/newUser', function(req, res){
- res.render('newUser');
+    res.render('newUser');
 });
 
 // Enter global chat
 app.get('/blackjack', function(req, res){
-  res.render('blackjack');
+    res.render('blackjack');
 
-userName = req.cookies['username'];
-console.log("UserName", userName);
+    userName = req.cookies['username'];
+    console.log("UserName", userName);
 });
 
 
 // ---------------------LISTENERS
 var userHash = {};
+<<<<<<< HEAD
   io.on('connection', function(socket){
   socket.nickname = userName;    
 
@@ -691,11 +700,12 @@ var playerIntheRP = function(){
 
 
 
+
     socket.on("join game", function(){
-    console.log("Its connecting");
-    joinGame();
+	console.log("Its connecting");
+	joinGame();
     });
-    
+
     // console.log(userName)
     userHash[socket.nickname] = socket;
     // console.log(userHash["nick"])
@@ -703,28 +713,29 @@ var playerIntheRP = function(){
     // io.emit("set time", count1 );
     // console.log("Timer Camilo", timeTest());
     socket.on("hit request", function(){
-      g.hit();
+	g.hit();
     });
     socket.on("stand request", function(){
-      g.stand();
+	g.stand();
 
     });
 
     socket.on("leave the table", function(){
-      g.logOut(socket.nickname);
+	g.logOut(socket.nickname);
 
     });
     // bet logic goes here:
     socket.on("bet", function(newBet){
 
-      g.playersArray[g.turn].bet += parseInt(newBet);
-      console.log('--------newBet-----');
-      console.log(g.playersArray[g.turn].bet);
-      console.log('-------------------');
+	g.playersArray[g.turn].bet += parseInt(newBet);
+	console.log('--------newBet-----');
+	console.log(g.playersArray[g.turn].bet);
+	console.log('-------------------');
     });
-    
+
 
     socket.on("disconnect", function(){
+<<<<<<< HEAD
       console.log("Retirado",userName);
       console.log("Retirado socket",socket.nickname);
       if (g !== null) {
@@ -754,58 +765,49 @@ var playerIntheRP = function(){
     }
 
 
-
     });
 });
 
 // ---------------------SHOWS INDEX PAGE
 app.get('/', function(req, res){
-  res.render('index');
+    res.render('index');
 });
 
 // ---------------------POST ROUTE FOR CREATING A NEW USER
 // Create new User
- //validate uniqueness of userName
- app.post("/newuser", function(req, res){
-   client.HSETNX("users", req.body.userName, req.body.userPass, function(err, success) {
-     if (success === 1) {
-       res.redirect('/');
-     } else {
-       console.log("person already exists, figure out how to render this to the page");
-     }
-   });
- });
-
-
-// ---------------------VALIDATES THE RIGHT USER NAME AND PASSWORND AND REDIRECTS TO GAME 
-//validates userPass === userName and logs in
- app.post("/blackjack", function(req, res){
-  var getUserPass = function(){
-    client.HGET("users", req.body.userName, function(err, reply){
-      if (err){
-        console.log("Could not query the database");
-      }
-      if (req.body.userPass == reply){
-        res.redirect("/blackjack");
-      } else {
-        console.log("Incorrect UserName or Password");
-        res.redirect('/');
-      }
+//validate uniqueness of userName
+app.post("/newuser", function(req, res){
+    client.HSETNX("users", req.body.userName, req.body.userPass, function(err, success) {
+	if (success === 1) {
+	    res.redirect('/');
+	} else {
+	    console.log("person already exists, figure out how to render this to the page");
+	}
     });
-  };
-  getUserPass();
 });
 
+
+// ---------------------VALIDATES THE RIGHT USER NAME AND PASSWORND AND REDIRECTS TO GAME
+//validates userPass === userName and logs in
+app.post("/blackjack", function(req, res){
+    var getUserPass = function(){
+	client.HGET("users", req.body.userName, function(err, reply){
+	    if (err){
+		console.log("Could not query the database");
+	    }
+	    if (req.body.userPass == reply){
+		res.redirect("/blackjack");
+	    } else {
+		console.log("Incorrect UserName or Password");
+		res.redirect('/');
+	    }
+	});
+    };
+    getUserPass();
+});
 
 
 // ---------------------START THE SERVER --------------------
-http.listen(3000, function(){
-  console.log('listening on *:3000');
-});
+http.listen(process.env.PORT || 3000);
 // ---------------------NOTHING AFTER THIS --------------------
-
-
-
-
-
 
