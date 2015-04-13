@@ -1,6 +1,6 @@
 $(document).ready(function() { 
 
-$('#leaveTableButton').toggle();
+$('#leaveTableButton').attr("disabled",true);
 // // -------------------ADD NEW PLAYERS  ------------------------------
 
 // // startGame(["nick", "camilo"]);
@@ -29,7 +29,6 @@ $('#leaveTableButton').toggle();
   });
 
   $(".bet").on("submit", function(e){
-
     socket.emit('bet', $('.bet-val').val());
   });
 
@@ -139,8 +138,13 @@ $('#leaveTableButton').toggle();
   });
 
 
-   socket.on('play again', function(){
-      $('#leaveTableButton').toggle();
+   socket.on('play again on', function(){
+      $('#leaveTableButton').attr("disabled",false);
+      
+    }); 
+
+   socket.on('play again off', function(){
+      $('#leaveTableButton').attr("disabled",true);
     }); 
 
    socket.on('delete winner message', function(message){

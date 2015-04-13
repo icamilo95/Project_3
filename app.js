@@ -521,7 +521,7 @@ Game.prototype.finishHand = function() {
   _this = this;
   count2 = 10;
   this.finishIntervalTrigger();
-  io.emit('turn off join game');
+  // io.emit('turn off join game');
   this.invitePlayersForAnotherRound();//------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
   //--- Next Timer sets up 10 sec before the next round 
   var finishTimer = setTimeout(function(){  
@@ -529,7 +529,7 @@ Game.prototype.finishHand = function() {
   // next line emits command to delete the timer message  
     io.emit('delete finish timer');
   // next line deletes "play again" message from screen
-    io.emit("play again");
+    io.emit("play again off");
   // Next line stops the timer on the screen for every player  
     _this.cleanTimer =  clearInterval(_this.finishIntervalId);
   // Next lines remove previos set of cards from the table  
@@ -538,9 +538,12 @@ Game.prototype.finishHand = function() {
        io.emit('delete winner message');
     }
 
-    // if ( g.playersArray[0].money > 0) { //---------------------Stops the game when money = $0
+    if ( roomPlayer.length > 0) { //---------------------Stops the game when money = $0
       joinGame();
-    // }
+    }else{
+      console.log("No players, Game Ended");
+    }
+
   },10000);
 };
 
@@ -560,27 +563,26 @@ Game.prototype.finishCallCounter = function(){
 };
 
 
-
-
 Game.prototype.invitePlayersForAnotherRound = function(){
-  io.emit("play again");
+  io.emit("play again on");
 };
 
 Game.prototype.logOut = function (name) {
-  // for (var i = 0; i < roomPlayer.length; i++) {
-    // roomPlayer.splice(roomPlayer[i],1);
-  // }
+  for (var j = 0; j < roomPlayer.length; j++) {
+    roomPlayer.splice(roomPlayer[j],1);
+  }
   for (var i = 0; i < this.playersArray.length; i++) {
     if (this.playersArray[i].name === name) {
     this.playersArray[i].logged = "No";  
     }
   }
+  
   console.log("users on PA after Log out: ", this.playersArray);
-  // if (roomPlayer.length === 1 ) {
-    // this.playersArray = [];
-    // g = null;
-    // clearTimeout(this.finishTimer);
-  // }
+  if (roomPlayer.length === 0 ) {
+    _this.playersArray = [];
+    g = null;
+    clearTimeout(_this.finishTimer);
+  }
 };
 
 
@@ -640,7 +642,7 @@ console.log("---------------------------");
 
     if (!playerIntheRP()) {
       roomPlayer.unshift(socket.nickname);
-      console.log("User name", socket.nickname);
+      console.log("User name added to RP", socket.nickname);
     }
     if (g !== null) {
 
@@ -731,7 +733,6 @@ var playerIntheRP = function(){
             g.playersArray[i].logged = "No";
             console.log(g.playersArray[i].name);
           }
-          
         }
       }    
     
@@ -740,7 +741,20 @@ var playerIntheRP = function(){
             roomPlayer.splice(j,1);
           }
           
-        }
+      }
+
+     console.log("users on PA after Log out: ", g.playersArray);
+     console.log("users on RP after Log out: ", roomPlayer);
+    if (roomPlayer.length === 0 ) {
+      console.log("Finish game called");
+      g.playersArray = [];
+      roomPlayer = [];
+      g = null;
+      // clearTimeout(g.finishTimer);
+    }
+
+
+
     });
 });
 
