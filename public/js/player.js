@@ -90,13 +90,13 @@ $('#leaveTableButton').toggle();
 //       });
 
   socket.on('turn off join game', function(){
-          $('#joinGameButton').attr(disabled,true);
+          $('#joinGameButton').attr("disabled",true);
           console.log("got it papi");
           // $('#joinGameButton').toggle();
   });
 
   socket.on('turn on join game', function(){
-          $('#joinGameButton').attr(disabled,false);
+          $('#joinGameButton').attr("disabled",false);
           // $('#joinGameButton').toggle();
   });
 
@@ -139,9 +139,9 @@ $('#leaveTableButton').toggle();
   });
 
 
-   socket.on('play again', function(){
-      $('#leaveTableButton').toggle();
-    }); 
+   // socket.on('play again', function(){
+   //    $('#leaveTableButton').toggle();
+   //  }); 
 
    socket.on('delete winner message', function(message){
       $('#winnerMessage').text(" ");

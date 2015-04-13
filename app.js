@@ -365,7 +365,7 @@ Game.prototype.checkForCurrentPlayers = function (){
     for (var i = 0; i < this.playersArray.length -1; i++) {
 	if (this.playersArray[i].logged === "No") {
 	    this.playersArray.splice(i, 1);
-	    tmpName = this.playersArray[i].name;
+	    // tmpName = this.playersArray[i].name;
 	}
     }
     // for (var j = 0; j < roomPlayer.length -1; j++) {
@@ -525,7 +525,7 @@ Game.prototype.finishHand = function() {
     _this = this;
     count2 = 10;
     this.finishIntervalTrigger();
-    io.emit('turn off join game');
+    // io.emit('turn off join game');
     this.invitePlayersForAnotherRound();//------------------------------------------------------------------(Display buttons YES & NO & Message "Play Again?")
     //--- Next Timer sets up 10 sec before the next round
     var finishTimer = setTimeout(function(){
@@ -658,9 +658,12 @@ io.on('connection', function(socket){
 		} else{
 		    for (var i = 0; i < queue.length; i++) {
 			// console.log("350 Splice is about to be called: ", queue[i]);
+			console.log("queue before splice into PA:  ", queue)
 			g.playersArray.splice(-1,0,(queue[i]));
+			console.log("queue before reset, after splice into PA:  ", queue)
 		    }
 		    g.reset();
+		    console.log("queue after reset:  ", queue)
 		    g.checkForCurrentPlayers();
 		    if (g !== null) {
 			g.setUpRound();
@@ -771,7 +774,7 @@ app.post("/newuser", function(req, res){
 //validates userPass === userName and logs in
 app.post("/blackjack", function(req, res){
     var getUserPass = function(){
-	clientHGET("users", req.body.userName, function(err, reply){
+	client.HGET("users", req.body.userName, function(err, reply){
 	    if (err){
 		console.log("Could not query the database");
 	    }
@@ -785,7 +788,6 @@ app.post("/blackjack", function(req, res){
     };
     getUserPass();
 });
-
 
 
 // ---------------------START THE SERVER --------------------
