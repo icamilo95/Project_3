@@ -3,14 +3,14 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var redis = require("redis");
-
-// var client = redis.createClient();
+// LOCAL HOST
+var client = redis.createClient();
 
  // FOR HEROKU                                                                                                                                                          
-var url = require('url');                                                                                                                                           
-var redisURL = url.parse(process.env.REDISCLOUD_URL);                                                                                                               
-var client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});                                                                          
-client.auth(redisURL.auth.split(":")[1]);
+// var url = require('url');                                                                                                                                           
+// var redisURL = url.parse(process.env.REDISCLOUD_URL);                                                                                                               
+// var client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});                                                                          
+// client.auth(redisURL.auth.split(":")[1]);
 
 
 
@@ -461,7 +461,7 @@ Game.prototype.playTimer = function(){
   this.timerPlay = setTimeout(function(){
     _this.playersArray[_this.turn].status = "Stand";
     _this.stand();
-  _this.cleanTimer =  clearInterval(_this.intervalId);
+  
   },21000);
 
 };
