@@ -369,7 +369,7 @@ var startGame = function(array){
 
 Game.prototype.checkForCurrentPlayers = function (){
   
-  for (var i = 0; i < this.playersArray.length -1; i++) {
+  for (var i = 0; i < this.playersArray.length; i++) {
     if (this.playersArray[i].logged === "No") {
       console.log("374 Before splice I will Remove from PA: ", this.playersArray[i].name);
       console.log("375 PA", this.playersArray);
