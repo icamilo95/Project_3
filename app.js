@@ -721,9 +721,6 @@ console.log("---------------------------");
 
 
 
-
-
-
     socket.on("join game", function(sock){
     console.log("Its connecting");
     var a = sock.split("");
@@ -836,13 +833,9 @@ app.get('/', function(req, res){
 });
 
 
-
-// ---------------------START THE SERVER --------------------
-http.listen(3000, function(){
-  console.log('listening on *:3000');
-});
-// ---------------------NOTHING AFTER THIS --------------------
-
+// ---------------------START THE SERVER --------------------                                                                                                          
+http.listen(process.env.PORT || 3000);
+// ---------------------NOTHING AFTER THIS --------------------                                                            
 
 
 
