@@ -562,7 +562,7 @@ Game.prototype.finishIntervalTrigger = function(){
   var _this = this;
   this.finishIntervalId = setInterval(function() {
     _this.finishCallCounter();
-    // io.emit('turn off join game');
+    io.emit('turn off join game');
   },1000);
 };
 
@@ -644,8 +644,7 @@ var userHash = {};
 
   var playerInthePA = function(player){
     for (var i = 0; i < g.playersArray.length; i++) {
-        if (g.playersArray[i].name === player) {
-          console.log("648 Player in the PA True", g.playersArray[i]);
+        if (playersArray[i].name === player) {
           return true;
         }
     }
