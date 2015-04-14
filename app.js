@@ -383,9 +383,10 @@ Game.prototype.checkForCurrentPlayers = function (){
   // }
 
   if (this.playersArray.length-1 === 0) {
-    console.log("Sole el delaer, se acaba el juego");
-    g = null;
-    this.playersArray = [];
+    console.log("Only the delaer, game will end after next round");
+    // g = null;
+    // this.playersArray = [];
+    
   }
   console.log(" 415 Players for the next Round " + this.playersArray);
 };
@@ -553,6 +554,11 @@ Game.prototype.finishHand = function() {
       joinGame();
     }else{
       console.log("544 No players, Game Ended");
+        console.log("Only the delaer, se acaba el juego");
+        g = null;
+        this.playersArray = [];
+        clearTimeout(this.timerPlay);
+        clearInterval(this.intervalId);  
     }
 
   },10000);
