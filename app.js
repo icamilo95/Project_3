@@ -534,7 +534,7 @@ Game.prototype.finishHand = function() {
   // next line emits command to delete the timer message  
     io.emit('delete finish timer');
   // next line deletes "play again" message from screen
-    io.emit("turn on join game");
+    // io.emit("turn on join game");
   // Next line stops the timer on the screen for every player  
     _this.cleanTimer =  clearInterval(_this.finishIntervalId);
   // Next lines remove previos set of cards from the table  
@@ -725,6 +725,7 @@ console.log("---------------------------");
     var name = a.join('');
     console.log("My name", name);
     joinGame(name);
+    userHash[name].emit('turn off join game');
     });
     
     // console.log(userName)
