@@ -546,7 +546,7 @@ Game.prototype.finishHand = function() {
     if ( _this.playersArray.length -1 > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }else{
-      console.log("544 No players, Game Ended");
+      console.log("549 No players, Game Ended");
         console.log("Only the delaer, se acaba el juego");
         g = null;
         this.playersArray = [];
@@ -690,8 +690,16 @@ console.log("---------------------------");
           }
           g.reset();
           g.checkForCurrentPlayers();
-          if (g !== null) {
+
+          if (g !== null && g.playersArray.length > 1) {
             g.setUpRound();
+          } else {
+            console.log("697 No players, Game Ended");
+            console.log("Only the delaer, game ends here");
+            g.playersArray = [];
+            clearTimeout(g.timerPlay);
+            clearInterval(g.intervalId);   
+            g = null;
           }
           
         }
