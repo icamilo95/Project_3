@@ -368,19 +368,16 @@ var startGame = function(array){
 
 
 Game.prototype.checkForCurrentPlayers = function (){
-  var tmpName = "";
+  
   for (var i = 0; i < this.playersArray.length -1; i++) {
     if (this.playersArray[i].logged === "No") {
+      console.log("374 Before splice I will Remove from PA: ", this.playersArray[i].name);
+      console.log("375 PA", this.playersArray);
       this.playersArray.splice(i, 1); 
-      tmpName = this.playersArray[i].name;
+      console.log("377 PA: ", this.playersArray);
     } 
   }
-  // for (var j = 0; j < roomPlayer.length -1; j++) {
-  //   if (roomPlayer[i] === tmpName) {
-  //     console.log("VaR TEMP", tmpName);
-  //     roomPlayer.splice(i,1);
-  //   } 
-  // }
+  
 
   if (this.playersArray.length-1 === 0) {
     console.log("Only the delaer, game will end after next round");
@@ -388,7 +385,7 @@ Game.prototype.checkForCurrentPlayers = function (){
     // this.playersArray = [];
     
   }
-  console.log(" 415 Players for the next Round " + this.playersArray);
+  // console.log(" 415 Players for the next Round " + this.playersArray);
 };
 
 
@@ -776,26 +773,6 @@ console.log("---------------------------");
         }
       }    
     
-      // for (var j = 0; j < roomPlayer.length; j++) {
-      //     if (roomPlayer[j] === socket.nickname) {
-      //       console.log("Taking player out of the RP called before", roomPlayer);
-      //       roomPlayer.splice(j,1);
-      //       console.log("Taking player out of the RP called after", roomPlayer);
-      //     }
-          
-      // }
-
-     // console.log("users on PA after Log out: ", g.playersArray);
-     // console.log("users on RP after Log out: ", roomPlayer);
-    // if (roomPlayer.length === 0 ) {
-    //   console.log("Finish game called");
-    //   g.playersArray = [];
-    //   roomPlayer = [];
-    //   g = null;
-    //   // clearTimeout(g.finishTimer);
-    // }
-
-
 
     });
 });
