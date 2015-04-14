@@ -4,13 +4,13 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var redis = require("redis");
 
-// var client = redis.createClient();
+var client = redis.createClient();
 
  // FOR HEROKU                                                                                                                                                          
-var url = require('url');                                                                                                                                           
-var redisURL = url.parse(process.env.REDISCLOUD_URL);                                                                                                               
-var client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});                                                                          
-client.auth(redisURL.auth.split(":")[1]);
+// var url = require('url');                                                                                                                                           
+// var redisURL = url.parse(process.env.REDISCLOUD_URL);                                                                                                               
+// var client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});                                                                          
+// client.auth(redisURL.auth.split(":")[1]);
 
 
 
@@ -668,7 +668,7 @@ console.log("---------------------------");
 // console.log("328 People in the RP : ", roomPlayer);
 // console.log("329 People in the queue : ", queue);
 
-  if ((sock) || (queue.length > 0)){
+  if ((sock) || (queue.length > 0) || g.playersArray.length > 1){
     console.log("Sock after Joining Game ", sock);
     // if (!playerIntheRP()) {
     //   roomPlayer.unshift(socket.nickname);
