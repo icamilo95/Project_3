@@ -139,6 +139,7 @@ $('#leaveTableButton').attr("disabled",true);
   });
 
 
+
    socket.on('play again on', function(){
       $('#leaveTableButton').attr("disabled",false);
       
@@ -147,6 +148,7 @@ $('#leaveTableButton').attr("disabled",true);
    socket.on('play again off', function(){
       $('#leaveTableButton').attr("disabled",true);
     }); 
+
 
    socket.on('delete winner message', function(message){
       $('#winnerMessage').text(" ");
