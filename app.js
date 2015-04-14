@@ -369,14 +369,12 @@ var startGame = function(array){
 
 Game.prototype.checkForCurrentPlayers = function (){
   
-  for (var i = 0; i < this.playersArray.length; i++) {
-    if (this.playersArray[i].logged === "No") {
-      console.log("374 Before splice I will Remove from PA: ", this.playersArray[i].name);
-      console.log("375 PA", this.playersArray);
-      this.playersArray.splice(i, 1); 
-      console.log("377 PA: ", this.playersArray);
-    } 
-  }
+  var yesPlayers = function(el) {
+    return el.logged === "Yes";
+  };
+
+  this.playersArray = this.playersArray.filter(yesPlayers);
+  console.log("New PA After Yes Fucntion", this.playersArray);
   
 
   if (this.playersArray.length-1 === 0) {
