@@ -365,8 +365,6 @@ var startGame = function(array){
 
 
 
-
-
 Game.prototype.checkForCurrentPlayers = function (){
   
   var yesPlayers = function(el) {
@@ -644,50 +642,40 @@ var userHash = {};
   socket.nickname = userName;    
 
 
-  // var playerIntheRP = function(){
-  //   for (var i = 0; i < roomPlayer.length; i++) {
-  //       if (roomPlayer[i] === socket.nickname) {
-  //           console.log("638 socket.nickname in playerIntheRP: ",socket.nickname);
-  //           return true;
-  //       }
-  //   }
-  //   return false;
-  //   };
-
-
-  //   if (!playerIntheRP()) {
-  //     roomPlayer.unshift(socket.nickname);
-  //     console.log("User name added to RP", socket.nickname);
-  //   }
+  var playerInthePA = function(player){
+    for (var i = 0; i < g.playersArray.length; i++) {
+        if (playersArray[i].name === player) {
+          return true;
+        }
+    }
+    return false;
+  };
 
 
 joinGame = function(sock) {
-    console.log("sock inside joinGame", sock);
+
 console.log("---------------------------");
 console.log("         New Round         ");
 console.log("---------------------------");
-// console.log("328 People in the RP : ", roomPlayer);
-// console.log("329 People in the queue : ", queue);
+
 
   if ((sock) || (queue.length > 0) || g.playersArray.length > 1){
     console.log("Sock after Joining Game ", sock);
-    // if (!playerIntheRP()) {
-    //   roomPlayer.unshift(socket.nickname);
-    //   console.log("User name added to RP", socket.nickname);
-    // }
+    
     if (g !== null) {
 
         if (gameInProcess === true) {
           
             var queueCheck = function(val){
-                return val === sock;
+                if (val === sock && !playerInthePA(val)) {
+                  return true;
+                }
             };
             // queue.filter returns an array []
             // if val === sock, the array contains a player
 
 
         if (queue.filter(queueCheck).length === 0) {
-            // console.log("342 gameInProcess-------------- ", gameInProcess);
             queue.push(new Player(sock, "Joined next hand"));
             for (var e = 0; e < queue.length; e++) {
              io.emit('player joined next hand', queue[e].name);   
