@@ -14,7 +14,8 @@ $('#leaveTableButton').attr("disabled",true);
   var socket = io();  
 
   $('#joinGame').on("submit", function(e){
-    socket.emit("join game");
+    socket.emit("join game", document.cookie);
+    console.log("socket is: ", document.cookie);
     $('#joinGameButton').attr("disabled",true);
     console.log("joined the game");
   });
@@ -89,13 +90,13 @@ $('#leaveTableButton').attr("disabled",true);
 //       });
 
   socket.on('turn off join game', function(){
-          $('#joinGameButton').attr(disabled,true);
+          $('#joinGameButton').attr("disabled",true);
           console.log("got it papi");
           // $('#joinGameButton').toggle();
   });
 
   socket.on('turn on join game', function(){
-          $('#joinGameButton').attr(disabled,false);
+          $('#joinGameButton').attr("disabled",false);
           // $('#joinGameButton').toggle();
   });
 

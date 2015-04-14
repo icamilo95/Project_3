@@ -157,14 +157,15 @@ var Player = function(name, status){
 
 //------------- GAME CLASS -------------------------------------
 
-var Game = function(players) {
+var Game = function(player) {
     this.playersArray = [];
 //     this.currentTurn =
 // push a player into the playersArray for each player in the
 // array that is passed in when you create a new game
-    for (var i=0;i<players.length;i++){
-        this.playersArray.push(new Player(players[i]));
-      }
+    // for (var i=0;i<players.length;i++){
+        // this.playersArray.push(new Player(players[i]));
+      // }
+    this.playersArray.push(new Player(player));
     this.playersArray.push(new Player("Dealer"));
     this.currentDeck = new Deck();
     this.turn = 0;
@@ -384,9 +385,9 @@ Game.prototype.checkForCurrentPlayers = function (){
 
 Game.prototype.setUpRound = function(){
 
-  for (var j = 0; j < roomPlayer.length; j++) {
-      console.log("RP:::::: ",roomPlayer[j]);  
-    }
+  // for (var j = 0; j < roomPlayer.length; j++) {
+  //     console.log("RP players in Set Up round ",roomPlayer[j]);  
+  //   }
 
 
   gameInProcess = true;
@@ -538,10 +539,10 @@ Game.prototype.finishHand = function() {
        io.emit('delete winner message');
     }
 
-    if ( roomPlayer.length > 0) { //---------------------Stops the game when money = $0
+    if ( _this.playersArray.length -1 > 0) { //---------------------Stops the game when money = $0
       joinGame();
     }else{
-      console.log("No players, Game Ended");
+      console.log("544 No players, Game Ended");
     }
 
   },10000);
@@ -567,23 +568,23 @@ Game.prototype.invitePlayersForAnotherRound = function(){
   io.emit("play again on");
 };
 
-Game.prototype.logOut = function (name) {
-  for (var j = 0; j < roomPlayer.length; j++) {
-    roomPlayer.splice(roomPlayer[j],1);
-  }
-  for (var i = 0; i < this.playersArray.length; i++) {
-    if (this.playersArray[i].name === name) {
-    this.playersArray[i].logged = "No";  
-    }
-  }
+// Game.prototype.logOut = function (name) {
+//   for (var j = 0; j < roomPlayer.length; j++) {
+//     roomPlayer.splice(roomPlayer[j],1);
+//   }
+//   for (var i = 0; i < this.playersArray.length; i++) {
+//     if (this.playersArray[i].name === name) {
+//     this.playersArray[i].logged = "No";  
+//     }
+//   }
   
-  console.log("users on PA after Log out: ", this.playersArray);
-  if (roomPlayer.length === 0 ) {
-    _this.playersArray = [];
-    g = null;
-    clearTimeout(_this.finishTimer);
-  }
-};
+//   console.log("users on PA after Log out: ", this.playersArray);
+//   if (roomPlayer.length === 0 ) {
+//     _this.playersArray = [];
+//     g = null;
+//     clearTimeout(_this.finishTimer);
+//   }
+// };
 
 
 
@@ -622,7 +623,7 @@ app.get('/blackjack', function(req, res){
   res.render('blackjack');
 
 userName = req.cookies['username'];
-console.log("UserName", userName);
+console.log("625 Last UserName", userName);
 });
 
 
@@ -631,32 +632,62 @@ var userHash = {};
   io.on('connection', function(socket){
   socket.nickname = userName;    
 
-joinGame = function() {
+
+  // var playerIntheRP = function(){
+  //   for (var i = 0; i < roomPlayer.length; i++) {
+  //       if (roomPlayer[i] === socket.nickname) {
+  //           console.log("638 socket.nickname in playerIntheRP: ",socket.nickname);
+  //           return true;
+  //       }
+  //   }
+  //   return false;
+  //   };
+
+
+  //   if (!playerIntheRP()) {
+  //     roomPlayer.unshift(socket.nickname);
+  //     console.log("User name added to RP", socket.nickname);
+  //   }
+
+
+joinGame = function(sock) {
+    console.log("sock inside joinGame", sock);
 console.log("---------------------------");
 console.log("         New Round         ");
 console.log("---------------------------");
 // console.log("328 People in the RP : ", roomPlayer);
 // console.log("329 People in the queue : ", queue);
 
-  if ((socket.nickname) || (roomPlayer.length > 0 && queue.length > 0)){
-
-    if (!playerIntheRP()) {
-      roomPlayer.unshift(socket.nickname);
-      console.log("User name added to RP", socket.nickname);
-    }
+  if ((sock) || (queue.length > 0)){
+    console.log("Sock after Joining Game ", sock);
+    // if (!playerIntheRP()) {
+    //   roomPlayer.unshift(socket.nickname);
+    //   console.log("User name added to RP", socket.nickname);
+    // }
     if (g !== null) {
 
         if (gameInProcess === true) {
-          console.log("342 gameInProcess-------------- ", gameInProcess);
-          queue.push(new Player(socket.nickname, "Joined next hand"));
-          io.emit('player joined next hand', queue[queue.length-1].name);
+          
+            var queueCheck = function(val){
+                return val === sock;
+            };
+            // queue.filter returns an array []
+            // if val === sock, the array contains a player
 
- // Send message to the player --> "Joined the next hand" ---------------(Display on Player Side)
 
-        } else{
+        if (queue.filter(queueCheck).length === 0) {
+            // console.log("342 gameInProcess-------------- ", gameInProcess);
+            queue.push(new Player(sock, "Joined next hand"));
+            for (var e = 0; e < queue.length; e++) {
+             io.emit('player joined next hand', queue[e].name);   
+            }
+        }
+             
+    } else{
           for (var i = 0; i < queue.length; i++) {
             // console.log("350 Splice is about to be called: ", queue[i]);
-            g.playersArray.splice(-1,0,(queue[i]));
+            console.log("659 Q before adding to PA", queue[i]);
+            g.playersArray.splice(0,0,(queue[i]));
           }
           g.reset();
           g.checkForCurrentPlayers();
@@ -666,7 +697,7 @@ console.log("---------------------------");
           
         }
     } else {
-      startGame(roomPlayer);
+      startGame(sock);
 
       //tester------------------tester
       for (var j = 0; j < g.playersArray.length ; j++) {
@@ -679,21 +710,17 @@ console.log("---------------------------");
 };
 
 
-var playerIntheRP = function(){
-  for (var i = 0; i < roomPlayer.length; i++) {
-      if (roomPlayer[i] === socket.nickname) {
-        console.log("369 socket.nickname in playerIntheRP: ",socket.nickname);
-        return true;
-      }
-  }
-  return false;
-};
 
 
 
-    socket.on("join game", function(){
+
+    socket.on("join game", function(sock){
     console.log("Its connecting");
-    joinGame();
+    var a = sock.split("");
+    a.splice(0,9);
+    var name = a.join('');
+    console.log("My name", name);
+    joinGame(name);
     });
     
     // console.log(userName)
@@ -736,22 +763,24 @@ var playerIntheRP = function(){
         }
       }    
     
-      for (var j = 0; j < roomPlayer.length; j++) {
-          if (roomPlayer[j] === socket.nickname) {
-            roomPlayer.splice(j,1);
-          }
+      // for (var j = 0; j < roomPlayer.length; j++) {
+      //     if (roomPlayer[j] === socket.nickname) {
+      //       console.log("Taking player out of the RP called before", roomPlayer);
+      //       roomPlayer.splice(j,1);
+      //       console.log("Taking player out of the RP called after", roomPlayer);
+      //     }
           
-      }
+      // }
 
-     console.log("users on PA after Log out: ", g.playersArray);
-     console.log("users on RP after Log out: ", roomPlayer);
-    if (roomPlayer.length === 0 ) {
-      console.log("Finish game called");
-      g.playersArray = [];
-      roomPlayer = [];
-      g = null;
-      // clearTimeout(g.finishTimer);
-    }
+     // console.log("users on PA after Log out: ", g.playersArray);
+     // console.log("users on RP after Log out: ", roomPlayer);
+    // if (roomPlayer.length === 0 ) {
+    //   console.log("Finish game called");
+    //   g.playersArray = [];
+    //   roomPlayer = [];
+    //   g = null;
+    //   // clearTimeout(g.finishTimer);
+    // }
 
 
 
