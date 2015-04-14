@@ -562,7 +562,7 @@ Game.prototype.finishIntervalTrigger = function(){
   var _this = this;
   this.finishIntervalId = setInterval(function() {
     _this.finishCallCounter();
-    io.emit('turn off join game');
+    // io.emit('turn off join game');
   },1000);
 };
 
