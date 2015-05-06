@@ -134,7 +134,7 @@ $('#leaveTableButton').attr("disabled",true);
 
 
    socket.on('delete winner message', function(message){
-      $('#winnerMessage').text(" TEST");
+      $('#winnerMessage').text(" ");
       $('#currentPlayers').empty();
       $('#joinedTheGame').empty();
     }); 
@@ -147,8 +147,8 @@ $('#leaveTableButton').attr("disabled",true);
 
   socket.on('delete previous cards', function(cards){
     for (var i=0;i < 5;i++){
-      $('#player_card_'+ (i + 1)).removeAttr('src');
-      $('#dealer_card_'+ (i + 1)).removeAttr('src');
+      $('#player_card_'+ (i + 1)).removeAttr('src','');
+      $('#dealer_card_'+ (i + 1)).removeAttr('src','');
     }
     console.log("Got it for this player, deleting " );
     
