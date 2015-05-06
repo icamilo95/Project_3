@@ -1,12 +1,7 @@
 $(document).ready(function() { 
 
 $('#leaveTableButton').attr("disabled",true);
-// // -------------------ADD NEW PLAYERS  ------------------------------
 
-// // startGame(["nick", "camilo"]);
-
-
-// //------------------- JQUERY -----------------------
 
 
 
@@ -64,7 +59,7 @@ $('#leaveTableButton').attr("disabled",true);
   });
 
   socket.on('show', function(){
-// <<<<<<< HEAD
+
     $('.hitb').attr("disabled",false);
     $('.standb').attr("disabled",false);
     $('.betb').attr("disabled",false);
@@ -84,10 +79,6 @@ $('#leaveTableButton').attr("disabled",true);
   });
 
 
-// =======
-//           $('.hitb').attr("disabled",false);
-//           $('.standb').attr("disabled",false);
-//       });
 
   socket.on('turn off join game', function(){
           $('#joinGameButton').attr("disabled",true);
@@ -100,14 +91,6 @@ $('#leaveTableButton').attr("disabled",true);
           // $('#joinGameButton').toggle();
   });
 
-//    socket.on('cards', function(cards){
-//       for (var i=0;i < cards.length;i++){
-//       var val_1 = cards[i].rank + " of " + cards[i].suit;
-//       $('#player_card_'+ (i + 1)).text(val_1);
-//       $('#player_card_'+ (i + 1)).attr('src','/img/'+ val_1 +'.png');
-//       }
-//     });
-// >>>>>>> 0b4b731709c8a26aa6a49918d883c8899f8b59f7
 
   socket.on('card_1_Dealer', function(cards){
     var val_1 = cards[0].rank + " of " + cards[0].suit;
@@ -151,7 +134,7 @@ $('#leaveTableButton').attr("disabled",true);
 
 
    socket.on('delete winner message', function(message){
-      $('#winnerMessage').text(" ");
+      $('#winnerMessage').text(" TEST");
       $('#currentPlayers').empty();
       $('#joinedTheGame').empty();
     }); 
@@ -175,35 +158,6 @@ $('#leaveTableButton').attr("disabled",true);
       $('#joinedTheGame').text(name + " joined next round");
     }); 
   
-
-  //----------------------SOCKET OTHER
-
-
-  // socket.on('hit reply', function(msg){
-  //   console.log(msg);
-  // });
-
-
-  
-
-
-
-  // socket.on('player joined next hand', function(msg) {
-  //   // append msg to wherever you want it.
-  // });
-
-  // socket.on('show buttons to user', function(){
-  //   $('body').append
-  // });
-
-  
-
-
-
-
-
-
-
 
 
  });

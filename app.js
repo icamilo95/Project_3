@@ -58,6 +58,8 @@ Card.prototype = {
   }
 };
 
+// -------------------DECK CLASS ------------------------------
+
 var Deck = function() {
   this.cards = [];
   for (var i = 0; i < Card.SUITS.length; i++) {   
@@ -67,9 +69,6 @@ var Deck = function() {
   }
   this.shuffle();
 };
-
-
-// -------------------DECK CLASS ------------------------------
 
 
 Deck.prototype = {
@@ -295,7 +294,7 @@ Game.prototype.dealerStatus = function(){
 };
 
 
-//-------------- SUPPORTIVE FUNCTIONS FOR CHECKFOR WINNER------------------
+//-------------- SUPPORTIVE FUNCTIONS FOR CHECKING FOR WINNER------------------
 
 
 
@@ -364,7 +363,6 @@ var startGame = function(array){
 };
 
 
-
 Game.prototype.checkForCurrentPlayers = function (){
   
   var yesPlayers = function(el) {
@@ -388,10 +386,6 @@ Game.prototype.checkForCurrentPlayers = function (){
 // ------------------- PLAY ROUND  -------------------------------
 
 Game.prototype.setUpRound = function(){
-
-  // for (var j = 0; j < roomPlayer.length; j++) {
-  //     console.log("RP players in Set Up round ",roomPlayer[j]);  
-  //   }
 
 
   gameInProcess = true;
@@ -475,7 +469,6 @@ Game.prototype.callCounter = function(){
 
 Game.prototype.hit = function(){
   this.deal(this.turn, 1);
-
 
   //tester------------------tester
   for (var i = 0; i < this.playersArray.length -1; i++) {
@@ -611,12 +604,7 @@ Game.prototype.reset = function(){
 };
 
 
-
-
-//  Take players out of the game
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
+// ----------SOCEK IO
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
  // ROUTES AND OTHER THINGS BELOW:
@@ -636,7 +624,7 @@ console.log("625 Last UserName", userName);
 });
 
 
-// ---------------------LISTENERS
+// ----------------------- LISTENERS --------------------------------
 var userHash = {};
   io.on('connection', function(socket){
   socket.nickname = userName;    
@@ -728,12 +716,9 @@ console.log("---------------------------");
     userHash[name].emit('turn off join game');
     });
     
-    // console.log(userName)
+    
     userHash[socket.nickname] = socket;
-    // console.log(userHash["nick"])
-    // --------TEST -----------------
-    // io.emit("set time", count1 );
-    // console.log("Timer Camilo", timeTest());
+    
     socket.on("hit request", function(){
       g.hit();
     });
